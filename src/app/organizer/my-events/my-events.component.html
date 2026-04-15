@@ -1,0 +1,77 @@
+<div class="my-events">
+  <div class="page-header">
+    <div>
+      <h1>My Events</h1>
+      <p>Manage, publish, and track your club's events.</p>
+    </div>
+    <a routerLink="/organizer/create-event" class="btn-primary">
+      <i class="pi pi-plus"></i> New Event
+    </a>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+
+  <div class="card empty-state" *ngIf="!loading && events.length === 0">
+    <i class="pi pi-calendar-plus empty-icon"></i>
+    <h3>No events yet</h3>
+    <p>Create your first event to start engaging your community.</p>
+    <a routerLink="/organizer/create-event" class="btn-primary" style="margin-top:16px">
+      <i class="pi pi-plus"></i> Create Event
+    </a>
+  </div>
+
+  <ng-container *ngIf="!loading && events.length > 0">
+    <!-- Filter bar -->
+    <div class="filter-bar card">
+      <p-tabmenu [model]="filterTabs" [(activeItem)]="activeTab" (activeItemChange)="onTabChange($event)" styleClass="events-tabs"></p-tabmenu>
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input pInputText type="text" placeholder="Search events…" [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
+      </p-iconfield>
+    </div>
+
+    <div class="no-results" *ngIf="filteredEvents.length === 0">
+      <p-message severity="info" text="No events match your filter." styleClass="w-full"></p-message>
+    </div>
+
+    <div class="ev-grid" *ngIf="filteredEvents.length > 0">
+      <div class="ev-card stagger-item" *ngFor="let ev of filteredEvents; let i = index"
+        [style.animation-delay]="(i * 0.05) + 's'">
+
+        <div class="ev-banner" [ngClass]="getBannerColor(ev.eventId)">
+          <p-tag
+            [value]="ev.status === 'PUBLISHED' ? 'Published' : ev.status === 'DRAFT' ? 'Draft' : 'Cancelled'"
+            [severity]="ev.status === 'PUBLISHED' ? 'success' : ev.status === 'DRAFT' ? 'secondary' : 'danger'"
+            styleClass="status-tag"
+          ></p-tag>
+          <p-tag
+            [value]="ev.paid ? '₹' + ev.fee : 'FREE'"
+            [severity]="ev.paid ? 'warning' : 'info'"
+            styleClass="fee-tag"
+          ></p-tag>
+        </div>
+
+        <div class="ev-body">
+          <h3 class="ev-title">{{ ev.title }}</h3>
+          <p class="ev-desc">{{ ev.description }}</p>
+          <div class="ev-chips">
+            <p-chip [label]="ev.location || 'TBA'" icon="pi pi-map-marker" styleClass="meta-chip"></p-chip>
+            <p-chip [label]="formatDate(ev.eventDate)" icon="pi pi-calendar" styleClass="meta-chip"></p-chip>
+            <p-chip [label]="(ev.capacity || '∞') + ' capacity'" icon="pi pi-users" styleClass="meta-chip"></p-chip>
+          </div>
+        </div>
+
+        <div class="ev-actions">
+          <p-button icon="pi pi-users" [text]="true" size="small" pTooltip="View Registrants" tooltipPosition="top"
+            [routerLink]="['/organizer/event-registrants', ev.eventId]"></p-button>
+          <p-button icon="pi pi-pencil" [text]="true" size="small" pTooltip="Edit" tooltipPosition="top"
+            [routerLink]="['/organizer/edit-event', ev.eventId]"></p-button>
+          <p-button *ngIf="ev.status === 'DRAFT'" icon="pi pi-send" [text]="true" size="small" severity="success"
+            pTooltip="Publish" tooltipPosition="top" (onClick)="publish(ev.eventId)"></p-button>
+          <p-button *ngIf="ev.status !== 'CANCELLED'" icon="pi pi-ban" [text]="true" size="small" severity="danger"
+            pTooltip="Cancel" tooltipPosition="top" (onClick)="cancel(ev.eventId)"></p-button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,76 @@
+<!-- src/app/organizer/layout/organizer-layout.component.html -->
+<div class="app-shell" [class.drawer-open]="sidebarOpen">
+
+  <p-toast position="top-right"></p-toast>
+
+  <!-- Session banner -->
+  <div class="session-banner" *ngIf="sessionExpiring">
+    <i class="pi pi-clock"></i>
+    Your session expires in {{ minutesLeft }} minute{{ minutesLeft !== 1 ? 's' : '' }}. Please re-login soon.
+    <button class="dismiss-btn" (click)="dismissBanner()">Dismiss</button>
+  </div>
+
+  <!-- Mobile backdrop -->
+  <div class="sb-overlay" *ngIf="sidebarOpen" (click)="sidebarOpen=false"></div>
+
+  <!-- Mobile hamburger -->
+  <button class="sb-hamburger" (click)="sidebarOpen=!sidebarOpen" aria-label="Toggle navigation">
+    <i class="pi" [class.pi-bars]="!sidebarOpen" [class.pi-times]="sidebarOpen"></i>
+  </button>
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sb-glow org-glow"></div>
+
+    <!-- Header -->
+    <div class="sb-logo">
+      <div class="sb-logo-mark org-mark"><i class="pi pi-calendar"></i></div>
+      <span class="sb-logo-text">EventClub</span>
+      <span class="sb-role-badge organizer">Organizer</span>
+    </div>
+
+    <!-- Nav -->
+    <nav class="sb-nav">
+      <div class="sb-section-label">Club</div>
+      <a class="sb-item org-item" routerLink="/organizer/dashboard" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-home"></i> <span>Dashboard</span>
+      </a>
+      <a class="sb-item org-item" routerLink="/organizer/create-event" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-calendar-plus"></i> <span>Create Event</span>
+      </a>
+      <a class="sb-item org-item" routerLink="/organizer/my-events" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-list"></i> <span>My Events</span>
+      </a>
+
+      <div class="sb-section-label">Tools</div>
+      <a class="sb-item org-item" routerLink="/organizer/qr-scanner" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-qrcode"></i> <span>QR Scanner</span>
+      </a>
+      <a class="sb-item org-item" routerLink="/organizer/analytics" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-chart-bar"></i> <span>Analytics</span>
+      </a>
+
+      <div class="sb-section-label">Account</div>
+      <a class="sb-item org-item" routerLink="/organizer/profile" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-user-circle"></i> <span>Profile</span>
+      </a>
+    </nav>
+
+    <!-- User chip -->
+    <div class="sb-user">
+      <div class="sb-user-avatar org-avatar">{{ fullName.charAt(0) }}</div>
+      <div>
+        <div class="sb-user-name">{{ fullName }}</div>
+        <div class="sb-user-email">Organizer</div>
+      </div>
+      <button class="sb-signout" (click)="logout()" title="Sign out">
+        <i class="pi pi-sign-out"></i>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <router-outlet></router-outlet>
+  </div>
+
+</div>

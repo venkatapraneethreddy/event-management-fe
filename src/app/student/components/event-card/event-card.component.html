@@ -1,0 +1,30 @@
+<p-card styleClass="event-card">
+
+  <ng-template pTemplate="title">{{ event.title || 'Untitled Event' }}</ng-template>
+
+  <ng-template pTemplate="subtitle">{{ event.club.clubName || 'Unknown Club' }}</ng-template>
+
+  <p class="date">{{ event.eventDate || 'Date TBA' }}</p>
+
+  <p-tag
+    [value]="alreadyRegistered ? 'Registered' : 'Open for registration'"
+    [severity]="alreadyRegistered ? 'success' : 'info'"
+  ></p-tag>
+
+  <div class="actions">
+    <p-button
+      (onClick)="register()"
+      [disabled]="registering || alreadyRegistered"
+      [loading]="registering"
+      [label]="alreadyRegistered ? 'Already Registered' : 'Register'"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      styleClass="w-full"
+    ></p-button>
+    <!-- legacy text button state removed
+
+  <span *ngIf="alreadyRegistered">Already Registered ✓</span>
+  -->
+  </div>
+
+</p-card>

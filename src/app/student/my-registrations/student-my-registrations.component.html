@@ -1,0 +1,137 @@
+<div class="my-registrations">
+  <div class="page-header">
+    <div>
+      <h1>My Registrations</h1>
+      <p>Your tickets and event registrations.</p>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+
+  <ng-container *ngIf="!loading">
+
+    <p-message *ngIf="pendingCount > 0" severity="warn"
+      [text]="pendingCount + ' registration' + (pendingCount > 1 ? 's' : '') + ' awaiting payment. Complete payment to confirm your spot.'"
+      styleClass="w-full mb-4"></p-message>
+
+    <div class="card empty-state" *ngIf="registrations.length === 0">
+      <i class="pi pi-ticket empty-icon"></i>
+      <h3>No registrations yet</h3>
+      <p>Head to the dashboard and register for an event.</p>
+    </div>
+
+    <ng-container *ngIf="registrations.length > 0">
+      <div class="toolbar">
+        <p-iconfield class="search-field">
+          <p-inputicon styleClass="pi pi-search" />
+          <input pInputText type="text" placeholder="Search by event, club, location…"
+            [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
+        </p-iconfield>
+        <p-selectbutton [options]="timeOptions" [(ngModel)]="timeFilter" optionLabel="label" optionValue="value"
+          (onChange)="applyFilter()"></p-selectbutton>
+        <span class="count-lbl">{{ filteredRegistrations.length }} result{{ filteredRegistrations.length !== 1 ? 's' : '' }}</span>
+      </div>
+
+      <p-message *ngIf="filteredRegistrations.length === 0" severity="info"
+        text="No registrations match your search." styleClass="w-full"></p-message>
+
+      <div class="reg-grid" *ngIf="filteredRegistrations.length > 0">
+        <div class="reg-card stagger-item"
+          *ngFor="let reg of filteredRegistrations; let i = index"
+          [style.animation-delay]="(i * 0.05) + 's'"
+          [class.pending]="reg.status === 'PENDING_PAYMENT'"
+          [class.past]="isPast(reg.event?.eventDate)">
+
+          <div class="reg-band" [ngClass]="getBandColor(reg.registrationId)">
+            <p-tag
+              [value]="reg.status === 'CONFIRMED' && !isPast(reg.event?.eventDate) ? 'Confirmed' : reg.status === 'PENDING_PAYMENT' ? 'Awaiting Payment' : 'Ended'"
+              [severity]="reg.status === 'CONFIRMED' && !isPast(reg.event?.eventDate) ? 'success' : reg.status === 'PENDING_PAYMENT' ? 'warning' : 'secondary'"
+              styleClass="reg-status-tag"
+            ></p-tag>
+            <p-tag *ngIf="reg.event?.paid" [value]="'₹' + reg.event?.fee" severity="warning" styleClass="fee-tag"></p-tag>
+            <p-tag *ngIf="!reg.event?.paid" value="FREE" severity="info" styleClass="fee-tag"></p-tag>
+          </div>
+
+          <div class="reg-body">
+            <div class="reg-club" *ngIf="reg.event?.club?.clubName">
+              <p-avatar [label]="reg.event?.club?.clubName?.charAt(0)" styleClass="club-av"></p-avatar>
+              <span>{{ reg.event?.club?.clubName }}</span>
+            </div>
+            <h3 class="reg-title">{{ reg.event?.title }}</h3>
+            <div class="reg-meta">
+              <span><i class="pi pi-map-marker"></i> {{ reg.event?.location || 'TBA' }}</span>
+              <span><i class="pi pi-calendar"></i> {{ formatDate(reg.event?.eventDate) }}</span>
+            </div>
+          </div>
+
+          <div class="reg-footer">
+            <p-button *ngIf="reg.status === 'PENDING_PAYMENT'"
+              [label]="'Pay ₹' + reg.event?.fee" icon="pi pi-credit-card"
+              [loading]="paying.has(reg.registrationId)"
+              (onClick)="pay(reg.registrationId)"
+              severity="warn" styleClass="w-full"></p-button>
+            <p-button *ngIf="reg.status === 'CONFIRMED'"
+              label="View Ticket" icon="pi pi-ticket"
+              (onClick)="openTicket(reg)"
+              [outlined]="true" styleClass="ticket-btn"></p-button>
+            <p-button *ngIf="!isPast(reg.event?.eventDate)"
+              icon="pi pi-trash"
+              [text]="true" severity="danger" size="small"
+              pTooltip="Cancel Registration" tooltipPosition="top"
+              [loading]="cancelling.has(reg.registrationId)"
+              (onClick)="cancelRegistration(reg.registrationId)"></p-button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <!-- Ticket Dialog -->
+  <p-dialog
+    [(visible)]="showTicketDialog"
+    [modal]="true"
+    header="Your Event Ticket"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="ticket-dialog"
+    [style]="{width: '420px'}"
+  >
+    <div class="ticket" *ngIf="selectedRegistration">
+      <div class="ticket-top">
+        <h3 class="ticket-event-name">{{ selectedRegistration.event?.title?.toUpperCase() }}</h3>
+        <p class="ticket-venue">{{ selectedRegistration.event?.location?.toUpperCase() || 'VENUE TBA' }}</p>
+      </div>
+      <div class="ticket-qr">
+        <qrcode [qrdata]="selectedRegistration.qrCode" [width]="180" [errorCorrectionLevel]="'M'"></qrcode>
+      </div>
+      <div class="ticket-divider">
+        <span class="td-dot left"></span>
+        <div class="td-line"></div>
+        <span class="td-dot right"></span>
+      </div>
+      <div class="ticket-details">
+        <div class="td-item">
+          <span class="td-label">ATTENDEE</span>
+          <span class="td-value">{{ selectedRegistration.studentName || 'You' }}</span>
+        </div>
+        <div class="td-item">
+          <span class="td-label">DATE</span>
+          <span class="td-value">{{ formatDate(selectedRegistration.event?.eventDate) }}</span>
+        </div>
+        <div class="td-item">
+          <span class="td-label">CLUB</span>
+          <span class="td-value">{{ selectedRegistration.event?.club?.clubName || 'N/A' }}</span>
+        </div>
+        <div class="td-item">
+          <span class="td-label">TICKET ID</span>
+          <span class="td-value mono">#EC-{{ selectedRegistration.registrationId }}</span>
+        </div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Download PDF Ticket" icon="pi pi-download" iconPos="left"
+        [loading]="downloadingTicket" (onClick)="downloadTicket(selectedRegistration)" styleClass="w-full"></p-button>
+      <p class="ticket-note">Present this QR code at the entrance for entry. Valid for single use only.</p>
+    </ng-template>
+  </p-dialog>
+</div>

@@ -1,0 +1,31 @@
+:host { display: block; }
+@keyframes pageFadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes staggerIn  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.stagger-item { opacity:0; animation: staggerIn .32s cubic-bezier(.4,0,.2,1) forwards; }
+.users-page { animation: pageFadeIn .28s cubic-bezier(.4,0,.2,1) both; }
+.page-header { margin-bottom:24px; h1 { font-size:22px; font-weight:700; color:var(--n-800); letter-spacing:-.025em; } p { font-size:13.5px; color:var(--n-400); margin-top:4px; } }
+.loading-state { display:flex; justify-content:center; padding:80px; }
+.spinner { width:20px; height:20px; border-radius:50%; border:2.5px solid var(--border-2); border-top-color:var(--brand); animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; @media (max-width:640px) { grid-template-columns:repeat(2,1fr); } }
+.stat-card {
+  background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r-lg); padding:18px 20px; cursor:pointer; transition:all var(--ease-fast); display:flex; align-items:center; gap:14px;
+  .stat-icon { width:40px; height:40px; border-radius:var(--r-md); display:flex; align-items:center; justify-content:center; i { font-size:18px; }
+    &.all      { background:var(--brand-bg); i { color:var(--brand); } }
+    &.student  { background:#eff6ff; i { color:#3b82f6; } }
+    &.organizer{ background:#f5f3ff; i { color:#7c3aed; } }
+    &.admin    { background:var(--danger-bg); i { color:var(--danger); } } }
+  .stat-num { display:block; font-size:22px; font-weight:800; color:var(--n-800); letter-spacing:-.04em; line-height:1; }
+  .stat-lbl { display:block; font-size:12px; color:var(--n-400); font-weight:500; margin-top:2px; }
+  &:hover { box-shadow:var(--sh-md); border-color:var(--n-300); }
+  &.active { border-color:var(--brand); background:var(--brand-bg); .stat-num { color:var(--brand); } }
+}
+
+.tbl-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+.count-badge { font-size:12.5px; color:var(--n-400); font-weight:500; }
+.user-cell { display:flex; align-items:center; gap:10px; }
+::ng-deep .user-av { background:var(--brand-bg) !important; color:var(--brand) !important; font-weight:700 !important; }
+.user-name  { font-size:14px; font-weight:600; color:var(--n-800); }
+.user-email { font-size:13px; color:var(--n-400); }
+.user-date  { font-size:12.5px; color:var(--n-500); }

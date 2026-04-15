@@ -1,0 +1,19 @@
+:host { display: block; }
+.qr-scanner { animation: pageFadeIn .28s cubic-bezier(.4,0,.2,1) both; }
+@keyframes pageFadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.page-header { margin-bottom:24px; h1 { font-size:22px; font-weight:700; color:var(--n-800); letter-spacing:-.025em; } p { font-size:13.5px; color:var(--n-400); margin-top:4px; } }
+.scanner-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; @media (max-width:700px) { grid-template-columns:1fr; } }
+.scanner-card { display:flex; flex-direction:column; gap:16px; padding:20px; }
+.scanner-wrap { border-radius:var(--r-lg); overflow:hidden; background:var(--n-50); border:1.5px solid var(--border); min-height:280px; display:flex; align-items:center; justify-content:center; }
+.scanner-wrap video { width:100%; min-height:280px; object-fit:cover; }
+.scanner-placeholder { text-align:center; color:var(--n-300); padding:40px; i { font-size:4rem; display:block; margin-bottom:16px; } p { font-size:14px; } }
+.scan-result { text-align:center; padding:40px; h3 { font-size:18px; font-weight:700; margin:12px 0 6px; } p { font-size:13.5px; line-height:1.5; } i { font-size:3rem; }
+  &.success { background:var(--success-bg); border:1px solid var(--success-bdr); border-radius:var(--r-lg); color:var(--success); }
+  &.error   { background:var(--danger-bg);  border:1px solid var(--danger-bdr);  border-radius:var(--r-lg); color:var(--danger); } }
+.manual-entry { display:flex; flex-direction:column; gap:8px; }
+.field-label { font-size:12.5px; font-weight:600; color:var(--n-600); }
+.scanner-controls { display:flex; flex-direction:column; gap:8px; }
+.instructions-card { h3 { font-size:15px; font-weight:700; color:var(--n-800); margin-bottom:20px; display:flex; align-items:center; gap:8px; i { color:var(--brand); } } }
+.steps { list-style:none; display:flex; flex-direction:column; gap:16px; padding:0; }
+.steps li { display:flex; align-items:flex-start; gap:12px; font-size:13.5px; color:var(--n-600); line-height:1.6; }
+.step-num { width:26px; height:26px; border-radius:50%; background:var(--brand-bg); color:var(--brand); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }

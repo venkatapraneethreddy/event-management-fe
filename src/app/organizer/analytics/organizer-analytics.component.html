@@ -1,0 +1,82 @@
+<div class="analytics">
+  <div class="page-header">
+    <div>
+      <h1>Analytics</h1>
+      <p>Track event performance, registrations, and revenue.</p>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+
+  <ng-container *ngIf="!loading">
+    <div class="kpi-row">
+      <div class="kpi-card stagger-item" style="animation-delay:.05s">
+        <div class="kpi-icon-wrap violet"><i class="pi pi-list"></i></div>
+        <div class="kpi-body"><span class="kpi-num">{{ stats.totalEvents }}</span><span class="kpi-lbl">Total Events</span></div>
+      </div>
+      <div class="kpi-card stagger-item" style="animation-delay:.1s">
+        <div class="kpi-icon-wrap green"><i class="pi pi-ticket"></i></div>
+        <div class="kpi-body"><span class="kpi-num">{{ stats.totalRegistrations }}</span><span class="kpi-lbl">Total Registrations</span></div>
+      </div>
+      <div class="kpi-card stagger-item" style="animation-delay:.15s">
+        <div class="kpi-icon-wrap blue"><i class="pi pi-chart-line"></i></div>
+        <div class="kpi-body">
+          <span class="kpi-num">{{ stats.totalEvents > 0 ? (stats.totalRegistrations / stats.totalEvents | number:'1.1-1') : '—' }}</span>
+          <span class="kpi-lbl">Avg / Event</span>
+        </div>
+      </div>
+      <div class="kpi-card stagger-item revenue-card" style="animation-delay:.2s">
+        <div class="kpi-icon-wrap amber"><i class="pi pi-indian-rupee"></i></div>
+        <div class="kpi-body"><span class="kpi-num">₹{{ stats.totalRevenue | number:'1.0-0' }}</span><span class="kpi-lbl">Total Revenue</span></div>
+      </div>
+    </div>
+
+    <div class="card chart-card stagger-item" *ngIf="stats.eventStats?.length > 0" style="animation-delay:.25s">
+      <div class="chart-hd">
+        <h3>Registrations per Event</h3>
+        <span>How many students signed up for each event</span>
+      </div>
+      <canvas baseChart [data]="barChartData" chartType="bar" [options]="barChartOptions"></canvas>
+    </div>
+
+    <div class="card stagger-item" *ngIf="hasPaidEvents" style="animation-delay:.3s; padding:0; overflow:hidden;">
+      <div class="chart-hd" style="padding:20px 24px; border-bottom:1px solid var(--border);">
+        <h3>Revenue Breakdown</h3>
+        <span>Confirmed paid registrations only</span>
+      </div>
+      <p-table [value]="stats.eventStats" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Event</th>
+            <th>Type</th>
+            <th style="text-align:center">Registrations</th>
+            <th>Revenue</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ev>
+          <tr>
+            <td><span class="ev-name">{{ ev.eventTitle }}</span></td>
+            <td>
+              <p-tag [value]="ev.paid ? 'Paid' : 'Free'" [severity]="ev.paid ? 'warning' : 'info'"></p-tag>
+            </td>
+            <td style="text-align:center;font-weight:700">{{ ev.registrations }}</td>
+            <td><span class="rev-val" [class.paid]="ev.paid">{{ ev.paid ? '₹' + (ev.revenue | number:'1.0-0') : '—' }}</span></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="2"><strong>Total</strong></td>
+            <td style="text-align:center;font-weight:700">{{ stats.totalRegistrations }}</td>
+            <td><strong class="rev-val paid">₹{{ stats.totalRevenue | number:'1.0-0' }}</strong></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <div class="card empty-state" *ngIf="!stats.eventStats?.length">
+      <i class="pi pi-chart-bar empty-icon"></i>
+      <h3>No data yet</h3>
+      <p>Create and publish events to start seeing analytics here.</p>
+    </div>
+  </ng-container>
+</div>

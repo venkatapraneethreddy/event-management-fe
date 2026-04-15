@@ -1,0 +1,133 @@
+<!-- src/app/organizer/dashboard/organizer-dashboard.component.html -->
+<div class="org-dash">
+
+  <div class="topbar">
+    <span class="topbar-title">Organizer Dashboard</span>
+    <button class="topbar-btn" (click)="refresh()">
+      <i class="pi pi-refresh"></i> Refresh
+    </button>
+    <a routerLink="/organizer/create-event" class="btn-primary"
+      [class.disabled]="club?.status !== 'APPROVED'">
+      <i class="pi pi-plus"></i> Create Event
+    </a>
+  </div>
+
+  <div class="main-inner">
+    <div class="page-header">
+      <div>
+        <h1>Organizer Dashboard</h1>
+        <p>Welcome back. Here's your club at a glance.</p>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner"></div>
+      <span>Loading club data…</span>
+    </div>
+
+    <ng-container *ngIf="!loading">
+
+      <!-- API error -->
+      <div class="alert alert-danger" *ngIf="loadError">
+        <i class="pi pi-exclamation-triangle"></i> Could not load club data.
+      </div>
+
+      <!-- No club yet -->
+      <div class="card no-club-card stagger-item" *ngIf="club === null && !loadError">
+        <div class="no-club-icon"><i class="pi pi-building"></i></div>
+        <div class="no-club-body">
+          <h3>No club yet</h3>
+          <p>Create a club to start organizing events. Once approved by admin, you can publish events to the campus.</p>
+          <a routerLink="/organizer/create-club" class="btn-primary" style="margin-top: 18px; display: inline-flex;">
+            <i class="pi pi-plus"></i> Create Your Club
+          </a>
+        </div>
+      </div>
+
+      <ng-container *ngIf="club">
+
+        <!-- Club banner -->
+        <div class="club-banner stagger-item" [ngClass]="club.status?.toLowerCase()">
+          <div class="club-banner-av">{{ club.clubName?.charAt(0) }}</div>
+          <div class="club-banner-info">
+            <h3>{{ club.clubName }}</h3>
+            <p>{{ club.description }}</p>
+          </div>
+          <span class="pill"
+            [class.pill-green]="club.status === 'APPROVED'"
+            [class.pill-amber]="club.status === 'PENDING'"
+            [class.pill-red]="club.status === 'REJECTED'">
+            {{ club.status === 'APPROVED' ? 'Active' : club.status === 'PENDING' ? 'Pending Approval' : 'Rejected' }}
+          </span>
+        </div>
+
+        <!-- Status alerts -->
+        <div class="alert alert-warn" *ngIf="club.status === 'PENDING'">
+          <i class="pi pi-clock"></i>
+          Your club is awaiting admin approval. You will be able to create events once approved.
+        </div>
+        <div class="alert alert-danger" *ngIf="club.status === 'REJECTED'">
+          <i class="pi pi-times-circle"></i>
+          Your club application was rejected. Please contact the admin for more information.
+        </div>
+
+        <!-- KPI cards -->
+        <div class="kpi-row" *ngIf="club.status === 'APPROVED'">
+          <div class="kpi-card blue stagger-item" style="animation-delay:.08s">
+            <div class="kpi-icon-wrap blue"><i class="pi pi-list"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-num">{{ eventCount }}</div>
+              <div class="kpi-lbl">Total Events</div>
+            </div>
+          </div>
+          <div class="kpi-card green stagger-item" style="animation-delay:.14s">
+            <div class="kpi-icon-wrap green"><i class="pi pi-ticket"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-num">{{ registrationCount }}</div>
+              <div class="kpi-lbl">Registrations</div>
+            </div>
+          </div>
+          <div class="kpi-card violet stagger-item" style="animation-delay:.2s">
+            <div class="kpi-icon-wrap violet"><i class="pi pi-globe"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-num">{{ publishedCount }}</div>
+              <div class="kpi-lbl">Published</div>
+            </div>
+          </div>
+          <div class="kpi-card amber stagger-item" style="animation-delay:.26s">
+            <div class="kpi-icon-wrap amber"><i class="pi pi-file-edit"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-num">{{ draftCount }}</div>
+              <div class="kpi-lbl">Drafts</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="sec-header" *ngIf="club.status === 'APPROVED'">
+          <h2 class="sec-title">Quick Actions</h2>
+        </div>
+        <div class="quick-grid" *ngIf="club.status === 'APPROVED'">
+          <a class="quick-card" routerLink="/organizer/create-event" style="--qc-color:#059669">
+            <div class="qc-icon"><i class="pi pi-calendar-plus"></i></div>
+            <div class="qc-label">Create Event</div>
+          </a>
+          <a class="quick-card" routerLink="/organizer/my-events" style="--qc-color:#0891b2">
+            <div class="qc-icon"><i class="pi pi-list"></i></div>
+            <div class="qc-label">My Events</div>
+          </a>
+          <a class="quick-card" routerLink="/organizer/qr-scanner" style="--qc-color:#7c3aed">
+            <div class="qc-icon"><i class="pi pi-qrcode"></i></div>
+            <div class="qc-label">QR Scanner</div>
+          </a>
+          <a class="quick-card" routerLink="/organizer/analytics" style="--qc-color:#d97706">
+            <div class="qc-icon"><i class="pi pi-chart-bar"></i></div>
+            <div class="qc-label">Analytics</div>
+          </a>
+        </div>
+
+      </ng-container>
+    </ng-container>
+  </div>
+</div>

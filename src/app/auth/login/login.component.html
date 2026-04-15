@@ -1,0 +1,280 @@
+<!-- src/app/auth/login/login.component.html -->
+<div class="wrap">
+
+  <!-- ── Left Panel ── -->
+  <div class="left">
+    <!-- Mesh aurora background -->
+    <div class="aurora-bg"></div>
+
+    <!-- Animated blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <!-- Grid overlay -->
+    <div class="left-grid"></div>
+
+    <!-- Floating particles -->
+    <div class="particles">
+      <span class="p p1"></span><span class="p p2"></span><span class="p p3"></span>
+      <span class="p p4"></span><span class="p p5"></span><span class="p p6"></span>
+    </div>
+
+    <div class="left-content">
+      <!-- Logo -->
+      <div class="ll-logo">
+        <div class="ll-logo-mark"><i class="pi pi-calendar"></i></div>
+        <span class="ll-logo-text">EventClub</span>
+        <span class="ll-logo-badge">Official</span>
+      </div>
+
+      <!-- Hero -->
+      <div class="ll-hero">
+        <h1>Empowering campus life,<br><em>one event at a time.</em></h1>
+        <p>The unified platform for students, club organizers, and administrators to build a vibrant college community.</p>
+      </div>
+
+      <!-- Stats ticker -->
+      <div class="stats-row">
+        <div class="stat-chip">
+          <i class="pi pi-users"></i>
+          <span class="stat-num">12,340+</span>
+          <span class="stat-label">Students</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-chip">
+          <i class="pi pi-calendar"></i>
+          <span class="stat-num">240+</span>
+          <span class="stat-label">Events</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-chip">
+          <i class="pi pi-building"></i>
+          <span class="stat-num">48</span>
+          <span class="stat-label">Clubs</span>
+        </div>
+      </div>
+
+      <!-- Feature list -->
+      <div class="ll-feats">
+        <div class="ll-feat feat-1">
+          <div class="ll-feat-icon"><i class="pi pi-search"></i></div>
+          <span>Discover unique campus experiences</span>
+        </div>
+        <div class="ll-feat feat-2">
+          <div class="ll-feat-icon"><i class="pi pi-building"></i></div>
+          <span>Manage your club effortlessly</span>
+        </div>
+        <div class="ll-feat feat-3">
+          <div class="ll-feat-icon"><i class="pi pi-qrcode"></i></div>
+          <span>Real-time attendance &amp; QR check-in</span>
+        </div>
+        <div class="ll-feat feat-4">
+          <div class="ll-feat-icon"><i class="pi pi-chart-bar"></i></div>
+          <span>Deep analytics &amp; registrant insights</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ll-badge">
+      <i class="pi pi-verified"></i>
+      Official Platform &nbsp;·&nbsp; College Events
+    </div>
+  </div>
+
+  <!-- ── Right Panel ── -->
+  <div class="right">
+
+    <!-- Session expired notice -->
+    <p-message
+      *ngIf="sessionExpired"
+      severity="warn"
+      text="Session expired — please sign in again."
+      styleClass="w-full mb-4">
+    </p-message>
+
+    <!-- ══ LOGIN ══ -->
+    <div class="box" *ngIf="!showRegister" [@fadeSlide]>
+
+      <div class="box-head">
+        <div class="box-logo">
+          <div class="box-logo-mark"><i class="pi pi-calendar"></i></div>
+        </div>
+        <h2>Welcome back</h2>
+        <p>Sign in to manage your events and club activities.</p>
+      </div>
+
+      <p-message *ngIf="loginError" severity="error" [text]="loginError" styleClass="w-full mb-4"></p-message>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+
+        <div class="p-field">
+          <label class="field-label">Email Address</label>
+          <div class="inp-wrap">
+            <i class="pi pi-envelope inp-icon"></i>
+            <input
+              class="inp-field"
+              type="email"
+              placeholder="you@college.edu"
+              formControlName="email"
+              [class.ng-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+            />
+          </div>
+          <small class="p-error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            Valid email is required
+          </small>
+        </div>
+
+        <div class="p-field">
+          <label class="field-label">Password</label>
+          <div class="inp-wrap" style="position:relative">
+            <i class="pi pi-lock inp-icon"></i>
+            <input
+              class="inp-field"
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="••••••••"
+              formControlName="password"
+              [class.ng-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            />
+            <button type="button" class="pw-toggle" (click)="showPassword=!showPassword">
+              <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+            </button>
+          </div>
+          <small class="p-error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            Password is required
+          </small>
+        </div>
+
+        <button type="submit" class="cta-btn" [class.loading]="isLoading" [disabled]="isLoading">
+          <i class="pi pi-spin pi-spinner" *ngIf="isLoading"></i>
+          <i class="pi pi-arrow-right-to-bracket" *ngIf="!isLoading"></i>
+          {{ isLoading ? 'Signing in…' : 'Sign In' }}
+          <i class="pi pi-arrow-right" *ngIf="!isLoading" style="margin-left:auto"></i>
+        </button>
+      </form>
+
+      <div class="auth-divider"><span>JOIN EVENTCLUB</span></div>
+
+      <div class="join-cards">
+        <div class="join-card" (click)="showRegister=true; setRole('STUDENT')" role="button">
+          <div class="jc-icon student"><i class="pi pi-graduation-cap"></i></div>
+          <div class="jc-text">
+            <span class="jc-label">Student</span>
+            <span class="jc-sub">Register &amp; discover events</span>
+          </div>
+          <i class="pi pi-chevron-right jc-arrow"></i>
+        </div>
+        <div class="join-card" (click)="showRegister=true; setRole('ORGANIZER')" role="button">
+          <div class="jc-icon organizer"><i class="pi pi-building"></i></div>
+          <div class="jc-text">
+            <span class="jc-label">Club Organizer</span>
+            <span class="jc-sub">Create and manage events</span>
+          </div>
+          <i class="pi pi-chevron-right jc-arrow"></i>
+        </div>
+      </div>
+
+      <div class="admin-row">
+        <button class="admin-link" type="button" (click)="showRegister=true; setRole('ADMIN')">
+          <i class="pi pi-shield-check"></i> Administrator access
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ REGISTER ══ -->
+    <div class="box" *ngIf="showRegister" [@fadeSlide]>
+
+      <div class="box-head">
+        <button class="back-btn" type="button" (click)="showRegister=false">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <div>
+          <h2>Create account</h2>
+          <p>Join EventClub as a student or club organizer.</p>
+        </div>
+      </div>
+
+      <!-- Step indicator -->
+      <div class="step-indicator">
+        <div class="step active"><span>1</span> Role</div>
+        <div class="step-line"></div>
+        <div class="step" [class.active]="registerForm.get('fullName')?.value"><span>2</span> Info</div>
+        <div class="step-line"></div>
+        <div class="step" [class.active]="registerForm.get('password')?.value"><span>3</span> Done</div>
+      </div>
+
+      <p-message *ngIf="registerError"   severity="error"   [text]="registerError"   styleClass="w-full mb-3"></p-message>
+      <p-message *ngIf="registerSuccess" severity="success" [text]="registerSuccess" styleClass="w-full mb-3"></p-message>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="login-form">
+
+        <!-- Role selector -->
+        <div class="p-field">
+          <label class="field-label">I am joining as</label>
+          <div class="role-btns">
+            <div class="role-btn"
+              [class.active]="registerForm.get('role')?.value==='STUDENT'"
+              (click)="registerForm.get('role')?.setValue('STUDENT')">
+              <div class="role-btn-icon student"><i class="pi pi-graduation-cap"></i></div>
+              <span>Student</span>
+            </div>
+            <div class="role-btn"
+              [class.active]="registerForm.get('role')?.value==='ORGANIZER'"
+              (click)="registerForm.get('role')?.setValue('ORGANIZER')">
+              <div class="role-btn-icon organizer"><i class="pi pi-building"></i></div>
+              <span>Organizer</span>
+            </div>
+            <div class="role-btn"
+              [class.active]="registerForm.get('role')?.value==='ADMIN'"
+              (click)="registerForm.get('role')?.setValue('ADMIN')">
+              <div class="role-btn-icon admin"><i class="pi pi-shield-check"></i></div>
+              <span>Admin</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-field">
+          <label class="field-label">Full Name</label>
+          <div class="inp-wrap">
+            <i class="pi pi-user inp-icon"></i>
+            <input class="inp-field" type="text" placeholder="Your full name" formControlName="fullName"
+              [class.ng-invalid]="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched"/>
+          </div>
+          <small class="p-error" *ngIf="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched">Name is required</small>
+        </div>
+
+        <div class="p-field">
+          <label class="field-label">Email</label>
+          <div class="inp-wrap">
+            <i class="pi pi-envelope inp-icon"></i>
+            <input class="inp-field" type="email" placeholder="you@college.edu" formControlName="email"
+              [class.ng-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"/>
+          </div>
+          <small class="p-error" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">Valid email required</small>
+        </div>
+
+        <div class="p-field">
+          <label class="field-label">Password</label>
+          <div class="inp-wrap" style="position:relative">
+            <i class="pi pi-lock inp-icon"></i>
+            <input class="inp-field" [type]="showRegPassword ? 'text' : 'password'"
+              placeholder="At least 6 characters" formControlName="password"
+              [class.ng-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"/>
+            <button type="button" class="pw-toggle" (click)="showRegPassword=!showRegPassword">
+              <i [class]="showRegPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+            </button>
+          </div>
+          <small class="p-error" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">Minimum 6 characters</small>
+        </div>
+
+        <button type="submit" class="cta-btn" [class.loading]="isLoading" [disabled]="isLoading">
+          <i class="pi pi-spin pi-spinner" *ngIf="isLoading"></i>
+          <i class="pi pi-check" *ngIf="!isLoading"></i>
+          {{ isLoading ? 'Creating account…' : 'Create Account' }}
+        </button>
+
+      </form>
+    </div>
+
+  </div>
+</div>

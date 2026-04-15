@@ -1,0 +1,122 @@
+<div class="page-header">
+  <div>
+    <h1>Club Management</h1>
+    <p>Approve, reject, or review all club applications on the platform.</p>
+  </div>
+</div>
+
+<div class="loading-state" *ngIf="loading">
+  <div class="spinner"></div>
+</div>
+
+<ng-container *ngIf="!loading">
+
+  <!-- Stats tabs -->
+  <div class="stats-row">
+    <div class="stat-card stagger-item" [class.active]="statusFilter==='ALL'" (click)="setFilter('ALL')" style="animation-delay:.05s">
+      <div class="stat-num">{{ clubs.length }}</div>
+      <div class="stat-lbl">All Clubs</div>
+    </div>
+    <div class="stat-card stagger-item pending" [class.active]="statusFilter==='PENDING'" (click)="setFilter('PENDING')" style="animation-delay:.1s">
+      <div class="stat-num">{{ pendingCount }}</div>
+      <div class="stat-lbl">Pending</div>
+    </div>
+    <div class="stat-card stagger-item approved" [class.active]="statusFilter==='APPROVED'" (click)="setFilter('APPROVED')" style="animation-delay:.15s">
+      <div class="stat-num">{{ approvedCount }}</div>
+      <div class="stat-lbl">Approved</div>
+    </div>
+    <div class="stat-card stagger-item rejected" [class.active]="statusFilter==='REJECTED'" (click)="setFilter('REJECTED')" style="animation-delay:.2s">
+      <div class="stat-num">{{ rejectedCount }}</div>
+      <div class="stat-lbl">Rejected</div>
+    </div>
+  </div>
+
+  <!-- Empty states -->
+  <div class="card empty-state" *ngIf="filteredClubs.length === 0 && statusFilter === 'PENDING' && pendingCount === 0">
+    <i class="pi pi-check-circle empty-icon" style="color:var(--success)"></i>
+    <h3>All caught up!</h3>
+    <p>No pending club applications right now.</p>
+  </div>
+  <div class="card empty-state" *ngIf="filteredClubs.length === 0 && (statusFilter !== 'PENDING' || pendingCount > 0)">
+    <i class="pi pi-search empty-icon"></i>
+    <h3>No clubs match</h3>
+    <p>Try changing your filter or search term.</p>
+  </div>
+
+  <!-- Panel -->
+  <div class="card approval-panel stagger-item" *ngIf="filteredClubs.length > 0" style="animation-delay:.25s">
+    <div class="panel-head">
+      <div>
+        <h3>{{ statusFilter === 'ALL' ? 'All Clubs' : statusFilter === 'PENDING' ? 'Pending Applications' : statusFilter === 'APPROVED' ? 'Approved Clubs' : 'Rejected Clubs' }}</h3>
+        <p>{{ filteredClubs.length }} club{{ filteredClubs.length !== 1 ? 's' : '' }}</p>
+      </div>
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input pInputText type="text" placeholder="Search by name or organizer…"
+          [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
+      </p-iconfield>
+    </div>
+
+    <p-table [value]="filteredClubs" [tableStyle]="{'min-width': '700px'}" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Club Name</th>
+          <th>Representative</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-club>
+        <tr>
+          <td>
+            <div class="club-name-cell">
+              <p-avatar [label]="getInitials(club.clubName)" shape="circle"
+                [styleClass]="'club-av ' + getAvatarColor(club.clubId)"></p-avatar>
+              <span class="club-name-txt">{{ club.clubName }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="rep-cell">
+              <p-avatar [label]="club.createdBy?.fullName?.charAt(0) || '?'" shape="circle" styleClass="rep-av"></p-avatar>
+              <div>
+                <div class="rep-name">{{ club.createdBy?.fullName || 'Unknown' }}</div>
+                <div class="rep-email">{{ club.createdBy?.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="club-desc">{{ club.description }}</span>
+          </td>
+          <td>
+            <p-tag
+              [value]="club.status"
+              [severity]="club.status === 'APPROVED' ? 'success' : club.status === 'PENDING' ? 'warning' : 'danger'"
+            ></p-tag>
+          </td>
+          <td>
+            <div class="action-btns">
+              <ng-container *ngIf="club.status === 'PENDING'">
+                <p-button label="Approve" icon="pi pi-check" severity="success" size="small"
+                  [loading]="processingId === club.clubId" (onClick)="approve(club.clubId)"></p-button>
+                <p-button label="Reject" icon="pi pi-times" severity="danger" [outlined]="true" size="small"
+                  [loading]="processingId === club.clubId" (onClick)="reject(club.clubId)"></p-button>
+              </ng-container>
+              <ng-container *ngIf="club.status === 'APPROVED'">
+                <p-button label="Reject" icon="pi pi-times" severity="danger" [outlined]="true" size="small"
+                  [loading]="processingId === club.clubId" (onClick)="reject(club.clubId)"></p-button>
+              </ng-container>
+              <ng-container *ngIf="club.status === 'REJECTED'">
+                <p-button label="Reset" icon="pi pi-refresh" severity="secondary" [outlined]="true" size="small"
+                  [loading]="processingId === club.clubId" (onClick)="resetToPending(club.clubId)"></p-button>
+                <p-button label="Approve" icon="pi pi-check" severity="success" size="small"
+                  [loading]="processingId === club.clubId" (onClick)="approve(club.clubId)"></p-button>
+              </ng-container>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+</ng-container>

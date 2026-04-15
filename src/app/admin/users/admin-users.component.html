@@ -1,0 +1,73 @@
+<div class="users-page">
+  <div class="page-header">
+    <div>
+      <h1>User Management</h1>
+      <p>View and manage all registered accounts on the platform.</p>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+
+  <ng-container *ngIf="!loading">
+    <div class="stats-row">
+      <div class="stat-card stagger-item" [class.active]="roleFilter==='ALL'" (click)="roleFilter='ALL'; applyFilter()" style="animation-delay:.05s">
+        <div class="stat-icon all"><i class="pi pi-users"></i></div>
+        <div><span class="stat-num">{{ users.length }}</span><span class="stat-lbl">All Users</span></div>
+      </div>
+      <div class="stat-card stagger-item" [class.active]="roleFilter==='STUDENT'" (click)="roleFilter='STUDENT'; applyFilter()" style="animation-delay:.1s">
+        <div class="stat-icon student"><i class="pi pi-graduation-cap"></i></div>
+        <div><span class="stat-num">{{ studentCount }}</span><span class="stat-lbl">Students</span></div>
+      </div>
+      <div class="stat-card stagger-item" [class.active]="roleFilter==='ORGANIZER'" (click)="roleFilter='ORGANIZER'; applyFilter()" style="animation-delay:.15s">
+        <div class="stat-icon organizer"><i class="pi pi-building"></i></div>
+        <div><span class="stat-num">{{ organizerCount }}</span><span class="stat-lbl">Organizers</span></div>
+      </div>
+      <div class="stat-card stagger-item" [class.active]="roleFilter==='ADMIN'" (click)="roleFilter='ADMIN'; applyFilter()" style="animation-delay:.2s">
+        <div class="stat-icon admin"><i class="pi pi-shield"></i></div>
+        <div><span class="stat-num">{{ adminCount }}</span><span class="stat-lbl">Admins</span></div>
+      </div>
+    </div>
+
+    <div class="card table-card stagger-item" style="animation-delay:.25s; padding:0; overflow:hidden;">
+      <div class="tbl-header">
+        <p-iconfield>
+          <p-inputicon styleClass="pi pi-search" />
+          <input pInputText type="text" placeholder="Search by name or email…"
+            [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
+        </p-iconfield>
+        <span class="count-badge">{{ filteredUsers.length }} of {{ users.length }} users</span>
+      </div>
+      <p-table [value]="filteredUsers" styleClass="p-datatable-sm" [tableStyle]="{'min-width':'600px'}">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Joined</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-user>
+          <tr>
+            <td>
+              <div class="user-cell">
+                <p-avatar [label]="user.fullName?.charAt(0) || '?'" shape="circle" styleClass="user-av"></p-avatar>
+                <span class="user-name">{{ user.fullName }}</span>
+              </div>
+            </td>
+            <td><span class="user-email">{{ user.email }}</span></td>
+            <td>
+              <p-tag
+                [value]="user.role"
+                [severity]="user.role === 'ADMIN' ? 'danger' : user.role === 'ORGANIZER' ? 'info' : 'secondary'"
+              ></p-tag>
+            </td>
+            <td><span class="user-date">{{ user.createdAt | date:'mediumDate' }}</span></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="4" style="text-align:center; padding:40px; color:var(--n-400)">No users match your search.</td></tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </ng-container>
+</div>

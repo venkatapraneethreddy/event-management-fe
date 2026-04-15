@@ -1,0 +1,70 @@
+<div class="layout" [class.drawer-open]="sidebarOpen">
+
+  <p-toast position="top-right"></p-toast>
+
+  <!-- Session expiry banner -->
+  <div class="session-banner" *ngIf="sessionExpiring">
+    <i class="pi pi-clock"></i>
+    Your session expires in ~{{ minutesLeft }} minute{{ minutesLeft !== 1 ? 's' : '' }}.
+    <button class="dismiss-btn" (click)="sessionExpiring = false">Dismiss</button>
+  </div>
+
+  <!-- Mobile backdrop -->
+  <div class="sb-overlay" *ngIf="sidebarOpen" (click)="sidebarOpen=false"></div>
+
+  <!-- Mobile hamburger -->
+  <button class="sb-hamburger" (click)="sidebarOpen=!sidebarOpen" aria-label="Toggle navigation">
+    <i class="pi" [class.pi-bars]="!sidebarOpen" [class.pi-times]="sidebarOpen"></i>
+  </button>
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <!-- Ambient glow -->
+    <div class="sb-glow"></div>
+
+    <!-- Header -->
+    <div class="sb-top">
+      <div class="sb-logo-mark">
+        <i class="pi pi-calendar"></i>
+      </div>
+      <div class="sb-top-text">
+        <span class="sb-brand-name">EventClub</span>
+        <span class="sb-brand-sub">Student Portal</span>
+      </div>
+      <span class="sb-role-badge student">Student</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sb-nav-list">
+      <a class="sb-item" routerLink="/student/dashboard" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-home"></i>
+        <span>Dashboard</span>
+      </a>
+      <a class="sb-item" routerLink="/student/my-registrations" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-ticket"></i>
+        <span>My Registrations</span>
+      </a>
+      <a class="sb-item" routerLink="/student/profile" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-user"></i>
+        <span>My Profile</span>
+      </a>
+    </nav>
+
+    <!-- Footer user chip -->
+    <div class="sb-footer">
+      <div class="sb-user-avatar">{{ fullName.charAt(0).toUpperCase() }}</div>
+      <div class="sb-meta">
+        <span class="sb-name">{{ fullName }}</span>
+        <span class="sb-role-text">Student</span>
+      </div>
+      <button class="sb-signout" (click)="logout()" title="Sign out">
+        <i class="pi pi-sign-out"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── Main content ── -->
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

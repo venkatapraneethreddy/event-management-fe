@@ -1,0 +1,139 @@
+<!-- src/app/admin/dashboard/admin-dashboard.component.html -->
+<div class="admin-dash">
+
+  <div class="topbar">
+    <span class="topbar-title">Administration Panel</span>
+  </div>
+
+  <div class="main-inner">
+    <div class="page-header">
+      <div>
+        <h1>Admin Dashboard</h1>
+        <p>Platform management, registrations, and club approvals.</p>
+      </div>
+    </div>
+
+    <!-- Loading skeletons -->
+    <ng-container *ngIf="loading">
+      <div class="kpi-row">
+        <p-skeleton *ngFor="let i of [1,2,3,4,5]" height="98px" borderRadius="20px"></p-skeleton>
+      </div>
+      <p-skeleton height="320px" borderRadius="18px" styleClass="mt-4"></p-skeleton>
+    </ng-container>
+
+    <ng-container *ngIf="!loading">
+
+      <!-- KPI cards -->
+      <div class="kpi-row">
+        <div class="kpi-card blue stagger-item" style="animation-delay:.05s">
+          <div class="kpi-icon-wrap blue"><i class="pi pi-graduation-cap"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-num">{{ stats.totalUsers }}</div>
+            <div class="kpi-lbl">Total Students</div>
+          </div>
+          <span class="kpi-trend">+12%</span>
+        </div>
+
+        <div class="kpi-card violet stagger-item" style="animation-delay:.1s">
+          <div class="kpi-icon-wrap violet"><i class="pi pi-building"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-num">{{ stats.totalClubs }}</div>
+            <div class="kpi-lbl">Total Clubs</div>
+          </div>
+          <span class="kpi-trend">+5%</span>
+        </div>
+
+        <div class="kpi-card green stagger-item" style="animation-delay:.15s">
+          <div class="kpi-icon-wrap green"><i class="pi pi-calendar"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-num">{{ stats.totalEvents }}</div>
+            <div class="kpi-lbl">Active Events</div>
+          </div>
+          <span class="kpi-trend">+8%</span>
+        </div>
+
+        <div class="kpi-card amber stagger-item"
+          [class.pending-highlight]="stats.pendingClubs > 0"
+          style="animation-delay:.2s">
+          <div class="kpi-icon-wrap amber"><i class="pi pi-clock"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-num" [style.color]="stats.pendingClubs > 0 ? '#fcd34d' : 'inherit'">
+              {{ stats.pendingClubs }}
+            </div>
+            <div class="kpi-lbl">Pending Approvals</div>
+          </div>
+          <a *ngIf="stats.pendingClubs > 0" routerLink="/admin/club-approvals" class="kpi-action">
+            Review <i class="pi pi-arrow-right"></i>
+          </a>
+        </div>
+
+        <div class="kpi-card rose stagger-item" style="animation-delay:.25s">
+          <div class="kpi-icon-wrap rose"><i class="pi pi-ticket"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-num">{{ stats.totalRegistrations }}</div>
+            <div class="kpi-lbl">Registrations</div>
+          </div>
+          <span class="kpi-trend">+18%</span>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div class="analytics-grid stagger-item" style="animation-delay:.3s">
+        <div class="chart-card">
+          <div class="chart-title">Registrations & Events Overview</div>
+          <canvas baseChart
+            [data]="barChartData"
+            [options]="barChartOptions"
+            type="bar">
+          </canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Club Approval Status</div>
+          <canvas baseChart
+            [data]="pieChartData"
+            type="pie">
+          </canvas>
+        </div>
+      </div>
+	  
+	  <div class="activity-card">
+  <h3>Live Activity</h3>
+
+  <div class="activity-list">
+    <div
+      class="activity-item"
+      *ngFor="let act of activities; let i = index"
+      [style.animation-delay]="(i * 0.05) + 's'">
+
+      <div class="act-dot" [ngClass]="act.type"></div>
+
+      <div class="act-content">
+        <div class="act-text">{{ act.text }}</div>
+        <div class="act-time">{{ act.time }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <!-- Quick nav cards -->
+      <div class="sec-header" style="margin-top:8px">
+        <h2 class="sec-title">Platform Management</h2>
+      </div>
+      <div class="quick-grid">
+        <a class="quick-card" routerLink="/admin/users" style="--qc-color:#0891b2">
+          <div class="qc-icon"><i class="pi pi-users"></i></div>
+          <div class="qc-label">Manage Users</div>
+        </a>
+        <a class="quick-card" routerLink="/admin/club-approvals" style="--qc-color:#d97706">
+          <div class="qc-icon"><i class="pi pi-building"></i></div>
+          <div class="qc-label">Club Approvals</div>
+        </a>
+        <a class="quick-card" routerLink="/admin/events" style="--qc-color:#7c3aed">
+          <div class="qc-icon"><i class="pi pi-calendar"></i></div>
+          <div class="qc-label">All Events</div>
+        </a>
+      </div>
+
+    </ng-container>
+  </div>
+</div>

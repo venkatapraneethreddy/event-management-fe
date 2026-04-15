@@ -1,0 +1,50 @@
+<div class="qr-scanner">
+  <div class="page-header">
+    <div>
+      <h1>QR Scanner</h1>
+      <p>Scan student QR codes to check in attendees at the entrance.</p>
+    </div>
+  </div>
+
+  <div class="scanner-grid">
+    <div class="card scanner-card">
+      <div class="scanner-wrap" id="scanner-wrap">
+        <div class="scanner-placeholder" *ngIf="!scanning && !lastResult">
+          <i class="pi pi-qrcode"></i>
+          <p>Activate the camera or enter a code manually to validate attendance.</p>
+        </div>
+        <video id="scanner-video" *ngIf="scanning" autoplay playsinline muted></video>
+        <div class="scan-result success" *ngIf="lastResult && resultType === 'success'">
+          <i class="pi pi-check-circle"></i>
+          <h3>Check-in successful</h3>
+          <p>{{ resultMessage }}</p>
+        </div>
+        <div class="scan-result error" *ngIf="resultType === 'error'">
+          <i class="pi pi-times-circle"></i>
+          <h3>Check-in failed</h3>
+          <p>{{ resultMessage }}</p>
+        </div>
+      </div>
+      <p-message *ngIf="cameraError" severity="error" [text]="cameraError"></p-message>
+      <div class="manual-entry">
+        <label class="field-label">Manual code entry</label>
+        <input pInputText type="text" [(ngModel)]="manualCode" placeholder="Paste or type the QR code value" class="w-full" />
+      </div>
+      <div class="scanner-controls">
+        <p-button *ngIf="!scanning" label="Start Scanner" icon="pi pi-camera" (onClick)="startCamera()" styleClass="w-full"></p-button>
+        <p-button *ngIf="scanning" label="Stop Scanner" icon="pi pi-stop" severity="danger" [outlined]="true" (onClick)="stopCamera()" styleClass="w-full"></p-button>
+        <p-button label="Submit Manual Code" icon="pi pi-check" severity="secondary" [loading]="submittingManual" [disabled]="!manualCode.trim()" (onClick)="submitManual()" styleClass="w-full"></p-button>
+        <p-button *ngIf="lastResult || resultType === 'error'" label="Clear Result" icon="pi pi-refresh" severity="contrast" [outlined]="true" (onClick)="clearResult()" styleClass="w-full"></p-button>
+      </div>
+    </div>
+    <div class="card instructions-card">
+      <h3><i class="pi pi-info-circle"></i> How to use</h3>
+      <ol class="steps">
+        <li><span class="step-num">1</span> Click <strong>Start Scanner</strong> to activate your camera.</li>
+        <li><span class="step-num">2</span> Point the camera at the student's QR code on their ticket.</li>
+        <li><span class="step-num">3</span> The system will automatically validate and check in the student.</li>
+        <li><span class="step-num">4</span> A green confirmation means successful check-in.</li>
+      </ol>
+    </div>
+  </div>
+</div>

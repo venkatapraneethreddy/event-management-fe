@@ -1,0 +1,130 @@
+<div class="edit-event">
+  <button class="btn-back-nav" (click)="goBack()">
+    <i class="pi pi-arrow-left"></i> My Events
+  </button>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+
+  <div class="card form-card" *ngIf="!loading">
+    <div class="form-header">
+      <div class="form-header-icon"><i class="pi pi-pencil"></i></div>
+      <div class="form-header-text">
+        <div class="form-title-row">
+          <h2>Edit Event</h2>
+          <p-tag *ngIf="event?.status"
+            [value]="event?.status"
+            [severity]="event?.status === 'PUBLISHED' ? 'success' : event?.status === 'DRAFT' ? 'secondary' : 'danger'"
+            styleClass="status-tag"
+          ></p-tag>
+        </div>
+        <p>Editing: <strong>{{ event?.title }}</strong></p>
+      </div>
+    </div>
+
+    <!-- Banner image -->
+    <div class="image-section">
+      <div class="image-preview" *ngIf="imagePreviewUrl">
+        <img [src]="imagePreviewUrl" alt="Event banner" />
+      </div>
+      <div class="image-placeholder" *ngIf="!imagePreviewUrl">
+        <i class="pi pi-image"></i>
+        <span>No banner image uploaded</span>
+      </div>
+      <div class="image-actions">
+        <p-fileupload
+          mode="basic"
+          accept="image/*"
+          maxFileSize="5000000"
+          chooseLabel="Choose Image"
+          chooseIcon="pi pi-image"
+          [auto]="false"
+          (onSelect)="onFileSelected($event)"
+          styleClass="file-upload-btn"
+        ></p-fileupload>
+        <p-button *ngIf="selectedFile" label="Upload Banner" icon="pi pi-upload"
+          severity="secondary" [loading]="uploadingImage" (onClick)="uploadImage()"></p-button>
+      </div>
+      <small class="image-hint">JPG/PNG, max 5MB. Recommended: 1200×400px</small>
+    </div>
+
+    <p-divider></p-divider>
+
+    <form [formGroup]="form" (ngSubmit)="save()" class="event-form">
+
+      <div class="form-section">
+        <h4 class="section-title"><i class="pi pi-info-circle"></i> Basic Information</h4>
+        <div class="p-field">
+          <label class="field-label">Event Title <span class="req">*</span></label>
+          <input pInputText type="text" formControlName="title" class="w-full"
+            [class.ng-invalid]="form.get('title')?.invalid && form.get('title')?.touched" />
+          <small class="p-error" *ngIf="form.get('title')?.invalid && form.get('title')?.touched">Minimum 3 characters</small>
+        </div>
+        <div class="p-field">
+          <label class="field-label">Description <span class="req">*</span></label>
+          <textarea pInputTextarea formControlName="description" rows="4" class="w-full"
+            [class.ng-invalid]="form.get('description')?.invalid && form.get('description')?.touched"></textarea>
+          <small class="p-error" *ngIf="form.get('description')?.invalid && form.get('description')?.touched">Required</small>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4 class="section-title"><i class="pi pi-map-marker"></i> Location &amp; Category</h4>
+        <div class="form-row-2">
+          <div class="p-field">
+            <label class="field-label">Location <span class="req">*</span></label>
+            <p-iconfield class="w-full">
+              <p-inputicon styleClass="pi pi-map-marker" />
+              <input pInputText type="text" formControlName="location" class="w-full" />
+            </p-iconfield>
+          </div>
+          <div class="p-field">
+            <label class="field-label">Category</label>
+            <p-select formControlName="category" [options]="categories" class="w-full"></p-select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4 class="section-title"><i class="pi pi-clock"></i> Schedule &amp; Capacity</h4>
+        <div class="form-row-2">
+          <div class="p-field">
+            <label class="field-label">Date &amp; Time <span class="req">*</span></label>
+            <input pInputText type="datetime-local" formControlName="eventDate" class="w-full"
+              [class.ng-invalid]="form.get('eventDate')?.invalid && form.get('eventDate')?.touched" />
+            <small class="p-error" *ngIf="form.get('eventDate')?.invalid && form.get('eventDate')?.touched">Required</small>
+          </div>
+          <div class="p-field">
+            <label class="field-label">Capacity <span class="req">*</span></label>
+            <p-inputnumber formControlName="capacity" [min]="1" class="w-full"
+              [class.ng-invalid]="form.get('capacity')?.invalid && form.get('capacity')?.touched"></p-inputnumber>
+            <small class="p-error" *ngIf="form.get('capacity')?.invalid && form.get('capacity')?.touched">At least 1</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4 class="section-title"><i class="pi pi-wallet"></i> Pricing</h4>
+        <div class="paid-toggle">
+          <p-checkbox formControlName="paid" [binary]="true" inputId="paidEdit"
+            label="This is a paid event"
+            [disabled]="event?.status === 'PUBLISHED'"></p-checkbox>
+          <small *ngIf="event?.status === 'PUBLISHED'" style="color:var(--n-400);margin-left:8px">Cannot change after publishing</small>
+        </div>
+        <div class="p-field fee-field" *ngIf="form.get('paid')?.value">
+          <label class="field-label">Fee (₹)</label>
+          <p-inputnumber formControlName="fee" [min]="0" prefix="₹ " class="w-full"
+            [disabled]="event?.status === 'PUBLISHED'"></p-inputnumber>
+        </div>
+      </div>
+
+      <p-message *ngIf="event?.status === 'PUBLISHED'" severity="info"
+        text="This event is published — changes will be visible to students immediately."
+        styleClass="w-full"></p-message>
+
+      <div class="form-actions">
+        <p-button type="button" label="Cancel" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+        <p-button type="submit" label="Save Changes" icon="pi pi-check" [loading]="saving"></p-button>
+      </div>
+    </form>
+  </div>
+</div>

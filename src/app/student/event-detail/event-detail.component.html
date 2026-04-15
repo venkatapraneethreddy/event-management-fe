@@ -1,0 +1,110 @@
+<div class="event-detail">
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+
+  <div class="card not-found" *ngIf="notFound">
+    <i class="pi pi-search-minus" style="font-size:2.5rem;color:var(--n-300);display:block;margin-bottom:16px"></i>
+    <h2>Event Not Found</h2>
+    <p>This event may have been removed or is no longer available.</p>
+    <p-button label="Back to Events" icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()" styleClass="mt-3"></p-button>
+  </div>
+
+  <ng-container *ngIf="!loading && event">
+    <button class="btn-back-nav" (click)="goBack()">
+      <i class="pi pi-arrow-left"></i> Back to Events
+    </button>
+
+    <div class="detail-grid">
+
+      <!-- Main content -->
+      <div class="main-col">
+
+        <!-- Hero -->
+        <div class="hero-banner" [ngClass]="getBannerColor(event.eventId)">
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <div class="hero-badges">
+              <p-tag [value]="event.paid ? '₹' + event.fee : 'Free Entry'" [severity]="event.paid ? 'warning' : 'success'" styleClass="hero-tag"></p-tag>
+              <p-tag *ngIf="isPastEvent()" value="Event Ended" severity="secondary" styleClass="hero-tag"></p-tag>
+              <p-tag *ngIf="event.full && !isPastEvent()" value="Sold Out" severity="danger" styleClass="hero-tag"></p-tag>
+            </div>
+            <h1>{{ event.title }}</h1>
+            <p class="hero-club" *ngIf="event.club?.clubName">
+              <i class="pi pi-building"></i> Organized by <strong>{{ event.club.clubName }}</strong>
+            </p>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="card desc-card">
+          <h3><i class="pi pi-info-circle"></i> About This Event</h3>
+          <p class="description">{{ event.description || 'No description provided.' }}</p>
+        </div>
+
+      </div>
+
+      <!-- Sidebar -->
+      <div class="side-col">
+        <div class="card info-card">
+          <h3 class="info-title">Event Details</h3>
+
+          <div class="info-rows">
+            <div class="info-row">
+              <div class="info-icon-wrap"><i class="pi pi-calendar"></i></div>
+              <div><div class="info-lbl">Date &amp; Time</div><div class="info-val">{{ formatDate(event.eventDate) }}</div></div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon-wrap"><i class="pi pi-map-marker"></i></div>
+              <div><div class="info-lbl">Location</div><div class="info-val">{{ event.location || 'To be announced' }}</div></div>
+            </div>
+            <div class="info-row" *ngIf="event.capacity">
+              <div class="info-icon-wrap"><i class="pi pi-users"></i></div>
+              <div>
+                <div class="info-lbl">Availability</div>
+                <div class="info-val">
+                  <span class="spots-txt" [class.ok]="!event.full && event.spotsLeft > event.capacity * 0.1"
+                    [class.low]="!event.full && event.spotsLeft <= event.capacity * 0.1"
+                    [class.full-txt]="event.full">
+                    {{ event.full ? 'Sold Out' : event.spotsLeft + ' of ' + event.capacity + ' spots left' }}
+                  </span>
+                  <p-progressbar *ngIf="!event.full" [value]="((event.capacity - event.spotsLeft) / event.capacity) * 100"
+                    styleClass="avail-bar"></p-progressbar>
+                </div>
+              </div>
+            </div>
+            <div class="info-row" *ngIf="event.paid">
+              <div class="info-icon-wrap"><i class="pi pi-indian-rupee"></i></div>
+              <div><div class="info-lbl">Registration Fee</div><div class="info-val fee-val">₹{{ event.fee }}</div></div>
+            </div>
+          </div>
+
+          <p-divider></p-divider>
+
+          <!-- CTA -->
+          <div class="info-cta">
+            <p-button
+              *ngIf="!alreadyRegistered && !isPastEvent() && !event.full"
+              [label]="event.paid ? 'Register & Pay ₹' + event.fee : 'Register — Free'"
+              icon="pi pi-arrow-right" iconPos="right"
+              [loading]="registering"
+              (onClick)="register()"
+              styleClass="w-full cta-register"
+            ></p-button>
+
+            <div class="full-msg" *ngIf="event.full && !alreadyRegistered">
+              <i class="pi pi-lock"></i> This event is fully booked
+            </div>
+
+            <div class="registered-box" *ngIf="alreadyRegistered">
+              <div class="reg-check"><i class="pi pi-check-circle"></i></div>
+              <div><strong>You're Registered!</strong><span>Check My Registrations for your ticket.</span></div>
+            </div>
+
+            <div class="ended-msg" *ngIf="isPastEvent()">
+              <i class="pi pi-clock"></i> Registration closed
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

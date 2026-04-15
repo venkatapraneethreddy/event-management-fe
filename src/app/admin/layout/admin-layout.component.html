@@ -1,0 +1,70 @@
+<!-- src/app/admin/layout/admin-layout.component.html -->
+<div class="app-shell" [class.drawer-open]="sidebarOpen">
+
+  <p-toast position="top-right"></p-toast>
+
+  <!-- Session banner -->
+  <div class="session-banner" *ngIf="sessionExpiring">
+    <i class="pi pi-clock"></i>
+    Your session expires in {{ minutesLeft }} minute{{ minutesLeft !== 1 ? 's' : '' }}. Please re-login soon.
+    <button class="dismiss-btn" (click)="dismissBanner()">Dismiss</button>
+  </div>
+
+  <!-- Mobile backdrop -->
+  <div class="sb-overlay" *ngIf="sidebarOpen" (click)="sidebarOpen=false"></div>
+
+  <!-- Mobile hamburger -->
+  <button class="sb-hamburger" (click)="sidebarOpen=!sidebarOpen" aria-label="Toggle navigation">
+    <i class="pi" [class.pi-bars]="!sidebarOpen" [class.pi-times]="sidebarOpen"></i>
+  </button>
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sb-glow admin-glow"></div>
+
+    <div class="sb-logo">
+      <div class="sb-logo-mark admin-mark"><i class="pi pi-shield-check"></i></div>
+      <span class="sb-logo-text">EventClub</span>
+      <span class="sb-role-badge admin">Admin</span>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-section-label">Platform</div>
+      <a class="sb-item adm-item" routerLink="/admin/dashboard" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-home"></i> <span>Dashboard</span>
+      </a>
+      <a class="sb-item adm-item" routerLink="/admin/users" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-users"></i> <span>Users</span>
+      </a>
+      <a class="sb-item adm-item" routerLink="/admin/club-approvals" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-building"></i>
+        <span>Club Approvals</span>
+        <span class="sb-badge adm-badge" *ngIf="pendingCount > 0">{{ pendingCount }}</span>
+      </a>
+      <a class="sb-item adm-item" routerLink="/admin/events" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-calendar"></i> <span>All Events</span>
+      </a>
+
+      <div class="sb-section-label">Account</div>
+      <a class="sb-item adm-item" routerLink="/admin/profile" routerLinkActive="active" (click)="sidebarOpen=false">
+        <i class="pi pi-user-circle"></i> <span>Profile</span>
+      </a>
+    </nav>
+
+    <div class="sb-user">
+      <div class="sb-user-avatar admin-avatar">{{ fullName.charAt(0) }}</div>
+      <div>
+        <div class="sb-user-name">{{ fullName }}</div>
+        <div class="sb-user-email">Administrator</div>
+      </div>
+      <button class="sb-signout" (click)="logout()" title="Sign out">
+        <i class="pi pi-sign-out"></i>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <router-outlet></router-outlet>
+  </div>
+
+</div>

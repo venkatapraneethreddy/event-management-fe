@@ -1,0 +1,97 @@
+<div class="create-event">
+  <button class="btn-back-nav" (click)="goBack()">
+    <i class="pi pi-arrow-left"></i> My Events
+  </button>
+
+  <div class="card form-card">
+    <div class="form-header">
+      <div class="form-header-icon"><i class="pi pi-calendar-plus"></i></div>
+      <div>
+        <h2>Create New Event</h2>
+        <p>Fill in the details below to create an event for your club.</p>
+      </div>
+    </div>
+
+    <p-message *ngIf="!clubLoading && clubStatus !== 'APPROVED'" severity="warn"
+      text="Your club must be approved before you can create events." styleClass="w-full mb-4"></p-message>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!clubLoading" class="event-form">
+
+      <div class="form-section">
+        <h4 class="section-title"><i class="pi pi-info-circle"></i> Basic Information</h4>
+        <div class="form-row">
+          <div class="p-field">
+            <label class="field-label">Event Title <span class="req">*</span></label>
+            <input pInputText type="text" formControlName="title" placeholder="e.g. Annual Tech Fest"
+              class="w-full" [class.ng-invalid]="form.get('title')?.invalid && form.get('title')?.touched" />
+            <small class="p-error" *ngIf="form.get('title')?.invalid && form.get('title')?.touched">Minimum 3 characters</small>
+          </div>
+        </div>
+        <div class="p-field">
+          <label class="field-label">Description <span class="req">*</span></label>
+          <textarea pInputTextarea formControlName="description" rows="3" placeholder="Describe your event…"
+            class="w-full" [class.ng-invalid]="form.get('description')?.invalid && form.get('description')?.touched"></textarea>
+          <small class="p-error" *ngIf="form.get('description')?.invalid && form.get('description')?.touched">Description is required</small>
+        </div>
+      </div>
+
+      <p-divider></p-divider>
+
+      <div class="form-section">
+        <h4 class="section-title"><i class="pi pi-map-marker"></i> Location &amp; Category</h4>
+        <div class="form-row-2">
+          <div class="p-field">
+            <label class="field-label">Location <span class="req">*</span></label>
+            <p-iconfield class="w-full">
+              <p-inputicon styleClass="pi pi-map-marker" />
+              <input pInputText type="text" formControlName="location" placeholder="e.g. Auditorium A" class="w-full" />
+            </p-iconfield>
+          </div>
+          <div class="p-field">
+            <label class="field-label">Category</label>
+            <p-select formControlName="category" [options]="categories" placeholder="Select category" class="w-full"></p-select>
+          </div>
+        </div>
+      </div>
+
+      <p-divider></p-divider>
+
+      <div class="form-section">
+        <h4 class="section-title"><i class="pi pi-clock"></i> Schedule &amp; Capacity</h4>
+        <div class="form-row-2">
+          <div class="p-field">
+            <label class="field-label">Date &amp; Time <span class="req">*</span></label>
+            <input pInputText type="datetime-local" formControlName="eventDate" class="w-full"
+              [class.ng-invalid]="form.get('eventDate')?.invalid && form.get('eventDate')?.touched" />
+            <small class="p-error" *ngIf="form.get('eventDate')?.invalid && form.get('eventDate')?.touched">Required</small>
+          </div>
+          <div class="p-field">
+            <label class="field-label">Capacity <span class="req">*</span></label>
+            <p-inputnumber formControlName="capacity" [min]="1" placeholder="Max attendees" class="w-full"
+              [class.ng-invalid]="form.get('capacity')?.invalid && form.get('capacity')?.touched"></p-inputnumber>
+            <small class="p-error" *ngIf="form.get('capacity')?.invalid && form.get('capacity')?.touched">At least 1</small>
+          </div>
+        </div>
+      </div>
+
+      <p-divider></p-divider>
+
+      <div class="form-section">
+        <h4 class="section-title"><i class="pi pi-wallet"></i> Pricing</h4>
+        <div class="paid-toggle">
+          <p-checkbox formControlName="paid" [binary]="true" inputId="paid" label="This is a paid event"></p-checkbox>
+        </div>
+        <div class="p-field fee-field" *ngIf="form.get('paid')?.value">
+          <label class="field-label">Registration Fee (₹) <span class="req">*</span></label>
+          <p-inputnumber formControlName="fee" [min]="0" placeholder="0" prefix="₹ " class="w-full"></p-inputnumber>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p-button type="button" label="Cancel" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+        <p-button type="submit" label="Create Event" icon="pi pi-check" iconPos="right"
+          [loading]="loading" [disabled]="loading || clubStatus !== 'APPROVED'"></p-button>
+      </div>
+    </form>
+  </div>
+</div>

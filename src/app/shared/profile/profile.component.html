@@ -1,0 +1,88 @@
+<div class="profile-page">
+  <div class="page-header">
+    <div>
+      <h1>My Profile</h1>
+      <p>Manage your personal information and account settings.</p>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+
+  <ng-container *ngIf="!loading">
+
+    <p-message *ngIf="nameSuccess" severity="success" [text]="nameSuccess" styleClass="w-full mb-4"></p-message>
+    <p-message *ngIf="passwordSuccess" severity="success" [text]="passwordSuccess" styleClass="w-full mb-4"></p-message>
+    <p-message *ngIf="passwordError" severity="error" [text]="passwordError" styleClass="w-full mb-4"></p-message>
+
+    <div class="profile-grid">
+
+      <!-- Profile card -->
+      <div class="card profile-card stagger-item" style="animation-delay:.05s">
+        <div class="avatar-section">
+          <div class="avatar-ring">
+            <p-avatar
+              [label]="profile?.fullName?.charAt(0)?.toUpperCase() || '?'"
+              shape="circle"
+              size="xlarge"
+              styleClass="profile-avatar"
+            ></p-avatar>
+          </div>
+          <h3>{{ profile?.fullName }}</h3>
+          <p-tag
+            [value]="profile?.role | titlecase"
+            [severity]="profile?.role === 'ADMIN' ? 'danger' : profile?.role === 'ORGANIZER' ? 'info' : 'secondary'"
+            styleClass="role-tag"
+          ></p-tag>
+          <p class="email">{{ profile?.email }}</p>
+        </div>
+      </div>
+
+      <!-- Edit form -->
+      <div class="card form-card stagger-item" style="animation-delay:.1s">
+        <h3 class="form-title">Personal Information</h3>
+        <form [formGroup]="nameForm" (ngSubmit)="saveName()" class="profile-form">
+          <div class="p-field">
+            <label class="field-label">Full Name</label>
+            <p-iconfield class="w-full">
+              <p-inputicon styleClass="pi pi-user" />
+              <input pInputText type="text" formControlName="fullName" placeholder="Your full name" class="w-full" />
+            </p-iconfield>
+          </div>
+          <div class="p-field">
+            <label class="field-label">Email</label>
+            <p-iconfield class="w-full">
+              <p-inputicon styleClass="pi pi-envelope" />
+              <input pInputText type="email" class="w-full" [readonly]="true" [value]="profile?.email || ''" />
+            </p-iconfield>
+            <small style="color:var(--n-400);font-size:12px">Email cannot be changed.</small>
+          </div>
+          <div class="form-actions">
+            <p-button type="submit" label="Save Changes" icon="pi pi-check" [loading]="savingName"></p-button>
+          </div>
+        </form>
+
+        <p-divider></p-divider>
+
+        <h3 class="form-title">Change Password</h3>
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="profile-form">
+          <div class="p-field">
+            <label class="field-label">Current Password</label>
+            <input pInputText type="password" formControlName="currentPassword" class="w-full" placeholder="••••••••" />
+          </div>
+          <div class="p-field">
+            <label class="field-label">New Password</label>
+            <input pInputText type="password" formControlName="newPassword" class="w-full" placeholder="At least 6 characters" />
+          </div>
+          <div class="p-field">
+            <label class="field-label">Confirm Password</label>
+            <input pInputText type="password" formControlName="confirmPassword" class="w-full" placeholder="Re-enter new password" />
+            <small class="p-error" *ngIf="passwordForm.hasError('mismatch') && passwordForm.touched">Passwords do not match.</small>
+          </div>
+          <div class="form-actions">
+            <p-button type="submit" label="Update Password" icon="pi pi-lock" severity="secondary" [loading]="savingPassword"></p-button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-container>
+</div>

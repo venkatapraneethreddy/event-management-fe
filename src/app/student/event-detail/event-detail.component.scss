@@ -1,0 +1,153 @@
+/* ========== HERO ENHANCEMENT ========== */
+.hero-banner {
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  position: relative;
+  height: 260px;
+
+  display: flex;
+  align-items: flex-end;
+
+  transition: transform .4s ease;
+}
+
+.hero-banner:hover {
+  transform: scale(1.01);
+}
+
+/* subtle zoom animation */
+.hero-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* overlay stronger depth */
+.hero-overlay {
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,.75),
+    rgba(0,0,0,.2)
+  );
+}
+
+/* title pop */
+.hero-content h1 {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  transform: translateY(6px);
+  opacity: 0;
+  animation: heroFade .4s ease forwards;
+}
+
+@keyframes heroFade {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* badges slight animation */
+.hero-badges {
+  animation: fadeIn .4s ease;
+}
+
+/* ========== DESCRIPTION CARD ========== */
+.desc-card {
+  transition: all .25s ease;
+}
+
+.desc-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+}
+
+/* ========== SIDEBAR STICKY (IMPORTANT) ========== */
+.side-col {
+  position: sticky;
+  top: 80px;
+  height: fit-content;
+}
+
+/* ========== INFO CARD POLISH ========== */
+.info-card {
+  border-radius: 16px;
+  transition: all .25s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+}
+
+/* icon animation */
+.info-icon-wrap {
+  transition: transform .2s ease;
+}
+
+.info-row:hover .info-icon-wrap {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* ========== CTA BUTTON (IMPORTANT) ========== */
+::ng-deep .cta-register {
+  border-radius: 14px !important;
+
+  background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+  border: none !important;
+
+  transition: all .25s ease !important;
+}
+
+/* hover effect */
+::ng-deep .cta-register:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(99,102,241,0.4);
+}
+
+/* click effect */
+::ng-deep .cta-register:active {
+  transform: scale(0.96);
+}
+
+/* ========== PROGRESS BAR SMOOTH ========== */
+::ng-deep .avail-bar .p-progressbar-value {
+  transition: width .6s ease;
+}
+
+/* ========== BACK BUTTON POLISH ========== */
+.btn-back-nav {
+  transition: all .2s ease;
+}
+
+.btn-back-nav:hover {
+  transform: translateX(-4px);
+  color: var(--brand);
+}
+
+/* ========== REGISTERED BOX ENHANCEMENT ========== */
+.registered-box {
+  animation: fadeIn .3s ease;
+  transition: all .25s ease;
+}
+
+.registered-box:hover {
+  transform: scale(1.02);
+}
+
+/* ========== EMPTY / NOT FOUND CARD ========== */
+.not-found {
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* subtle fade */
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(6px); }
+  to { opacity:1; transform:translateY(0); }
+}

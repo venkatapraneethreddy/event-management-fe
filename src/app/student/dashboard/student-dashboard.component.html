@@ -1,0 +1,320 @@
+<!-- src/app/student/dashboard/student-dashboard.component.html -->
+<div class="dashboard">
+
+  <!-- ── Topbar ── -->
+  <div class="dash-topbar">
+    <span class="dash-topbar-title">
+      <i class="pi pi-home"></i> Student Portal
+    </span>
+    <div class="search-wrap">
+      <i class="pi pi-search search-icon"></i>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Search events, clubs, locations…"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="applyFilter()"
+      />
+      <button class="search-clear" *ngIf="searchTerm" (click)="searchTerm=''; applyFilter()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="dash-body">
+
+    <!-- ── Hero greeting ── -->
+    <div class="hero-band" *ngIf="!loading && !searchTerm">
+      <div class="hero-blob hero-blob-1"></div>
+      <div class="hero-blob hero-blob-2"></div>
+      <div class="hero-grid"></div>
+      <div class="hero-content">
+        <div class="hero-avatar">{{ userName.charAt(0).toUpperCase() }}</div>
+        <div class="hero-text">
+          <h1>Hello, {{ userName }}! 👋</h1>
+          <p>{{ allUpcoming.length }} upcoming event{{ allUpcoming.length !== 1 ? 's' : '' }} on campus — don't miss out!</p>
+        </div>
+        <div class="hero-stats" *ngIf="allUpcoming.length > 0">
+          <div class="hero-stat">
+            <span class="hero-stat-num">{{ allUpcoming.length }}</span>
+            <span class="hero-stat-lbl">Upcoming</span>
+          </div>
+          <div class="hero-stat-div"></div>
+          <div class="hero-stat">
+            <span class="hero-stat-num">{{ registeredEventIds.size }}</span>
+            <span class="hero-stat-lbl">Joined</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Error ── -->
+    <div class="alert alert-danger" *ngIf="loadError">
+      <i class="pi pi-exclamation-triangle"></i>
+      Failed to load events. Please refresh the page.
+    </div>
+
+    <!-- ── Filter bar ── -->
+    <div class="filter-bar" *ngIf="!loading">
+      <i class="pi pi-filter" style="color: rgba(255,255,255,.25); font-size: 13px;"></i>
+      <button class="filter-pill" [class.active]="filterType==='all'"
+        (click)="filterType='all'; applyFilter()">All</button>
+      <button class="filter-pill" [class.active]="filterType==='free'"
+        (click)="filterType='free'; applyFilter()">Free</button>
+      <button class="filter-pill" [class.active]="filterType==='paid'"
+        (click)="filterType='paid'; applyFilter()">Paid</button>
+
+      <div class="filter-divider"></div>
+
+      <button class="filter-pill" [class.active]="categoryFilter==='ALL'"
+        (click)="categoryFilter='ALL'; applyFilter()">All Types</button>
+      <button
+        *ngFor="let cat of categories"
+        class="filter-pill"
+        [class.active]="categoryFilter===cat"
+        (click)="categoryFilter=cat; applyFilter()">
+        {{ cat | titlecase }}
+      </button>
+    </div>
+
+    <!-- ── Loading skeletons ── -->
+    <ng-container *ngIf="loading">
+      <div class="ev-grid">
+        <p-skeleton *ngFor="let i of [1,2,3,4,5,6]" height="320px" borderRadius="20px"></p-skeleton>
+      </div>
+    </ng-container>
+
+    <!-- ── Upcoming events ── -->
+    <ng-container *ngIf="!loading && allUpcoming.length > 0">
+      <div class="sec-header">
+        <h2 class="sec-title">Upcoming Events</h2>
+        <span class="sec-count">{{ allUpcoming.length }}</span>
+      </div>
+
+      <div class="ev-grid">
+        <div
+          class="ev-card stagger-item"
+          (click)="openModal(e)"
+          *ngFor="let e of upcomingEvents; let i = index"
+          [style.animation-delay]="(i * 0.055) + 's'"
+          [class.full]="e.full"
+          [class.registered-card]="registeredEventIds.has(e.eventId)"
+          [class.almost-full]="isAlmostFull(e)"
+          [class.today]="isToday(e.eventDate)">
+
+          <!-- Image / color band -->
+          <div class="ev-img" [ngClass]="getCardColor(e.eventId)"
+            [class.has-image]="!!e.imageUrl"
+            [style.backgroundImage]="e.imageUrl ? 'url(' + getImageUrl(e.imageUrl) + ')' : null">
+            <div class="ev-img-inner" *ngIf="e.imageUrl"
+              [style.backgroundImage]="'url(' + getImageUrl(e.imageUrl) + ')'"></div>
+
+            <div class="ev-img-badges">
+              <span class="ev-badge date" *ngIf="e.eventDate">
+                <i class="pi pi-calendar"></i> {{ formatShortDate(e.eventDate) }}
+              </span>
+              <span class="ev-badge" [class.free]="!e.paid" [class.paid]="e.paid">
+                {{ e.paid ? '₹' + e.fee : 'FREE' }}
+              </span>
+              <span class="ev-badge warn" *ngIf="isAlmostFull(e) && !e.full">
+                <i class="pi pi-bolt"></i> Almost Full
+              </span>
+              <span class="ev-badge today" *ngIf="isToday(e.eventDate)">
+                <i class="pi pi-star-fill"></i> Today
+              </span>
+              <span class="ev-badge registered" *ngIf="registeredEventIds.has(e.eventId)">
+                <i class="pi pi-check-circle"></i> Joined
+              </span>
+            </div>
+            <span class="ev-cat" *ngIf="e.category && e.category !== 'OTHER'">{{ e.category | titlecase }}</span>
+          </div>
+
+          <!-- Body -->
+          <div class="ev-body">
+            <div class="ev-club" *ngIf="e.club?.clubName">
+              <div class="ev-club-av">{{ e.club.clubName.charAt(0) }}</div>
+              {{ e.club.clubName }}
+            </div>
+
+            <div class="ev-title">
+              <a [routerLink]="['/student/event', e.eventId]" (click)="$event.stopPropagation()">{{ e.title }}</a>
+            </div>
+
+            <div class="ev-meta">
+              <span><i class="pi pi-clock"></i>{{ formatTime(e.eventDate) }}</span>
+              <span><i class="pi pi-map-marker"></i>{{ e.location || 'TBA' }}</span>
+            </div>
+
+            <div class="spots-wrap" *ngIf="e.capacity">
+              <div class="spots-bar-track">
+                <div class="spots-bar-fill"
+                  [class.warning]="getCapacityPercent(e) > 80"
+                  [style.width]="getCapacityPercent(e) + '%'"></div>
+              </div>
+              <div class="spots-lbl"
+                [class.danger]="e.full"
+                [class.warning]="!e.full && getCapacityPercent(e) > 80">
+                {{ e.full ? '🔒 Fully Booked' : isAlmostFull(e) ? 'Hurry — filling fast' : (e.spotsLeft + ' spots left') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer action -->
+          <div class="ev-foot">
+            <button
+              *ngIf="!registeredEventIds.has(e.eventId) && !e.full"
+              class="reg-btn"
+              [disabled]="registering.has(e.eventId)"
+              (click)="$event.stopPropagation(); register(e.eventId)">
+              <i class="pi"
+                [class.pi-spin]="registering.has(e.eventId)"
+                [class.pi-spinner]="registering.has(e.eventId)"
+                [class.pi-bolt]="!registering.has(e.eventId)">
+              </i>
+              {{ registering.has(e.eventId) ? 'Registering…' : 'Register Now' }}
+              <i class="pi pi-arrow-right" *ngIf="!registering.has(e.eventId)" style="margin-left:auto"></i>
+            </button>
+
+            <div class="btn-registered" *ngIf="registeredEventIds.has(e.eventId)">
+              <i class="pi pi-check-circle"></i> Registered
+            </div>
+            <div class="btn-full" *ngIf="e.full && !registeredEventIds.has(e.eventId)">
+              <i class="pi pi-lock"></i> Event Full
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <app-pagination
+        [totalItems]="allUpcoming.length"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        (pageChange)="onPageChange($event)">
+      </app-pagination>
+    </ng-container>
+
+    <!-- ── Empty state ── -->
+    <div class="card empty-state" *ngIf="!loading && filteredEvents.length === 0">
+      <i class="pi pi-inbox empty-icon"></i>
+      <h3>No events found</h3>
+      <p>Try a different search term or filter.</p>
+    </div>
+
+    <!-- ── Past Events ── -->
+    <ng-container *ngIf="!loading && pastEvents.length > 0">
+      <div class="sec-header" style="margin-top: 48px;">
+        <h2 class="sec-title" style="color: rgba(255,255,255,.3)">Past Events</h2>
+        <span class="sec-count">{{ pastEvents.length }}</span>
+        <button class="filter-pill" style="margin-left: auto;" (click)="showPast=!showPast">
+          {{ showPast ? 'Hide' : 'Show' }}
+        </button>
+      </div>
+
+      <div class="ev-grid past-grid" *ngIf="showPast">
+        <div class="ev-card past" *ngFor="let e of pastEvents">
+          <div class="ev-img" [ngClass]="getCardColor(e.eventId)" style="opacity:.4">
+            <div class="ev-img-badges">
+              <span class="ev-badge date">Ended</span>
+            </div>
+          </div>
+          <div class="ev-body">
+            <div class="ev-title">{{ e.title }}</div>
+            <div class="ev-meta">
+              <span><i class="pi pi-calendar"></i>{{ formatDate(e.eventDate) }}</span>
+              <span><i class="pi pi-map-marker"></i>{{ e.location || 'TBA' }}</span>
+            </div>
+          </div>
+          <div class="ev-foot">
+            <div class="btn-registered" *ngIf="registeredEventIds.has(e.eventId)">
+              <i class="pi pi-check-circle"></i> Attended
+            </div>
+            <div class="btn-ended" *ngIf="!registeredEventIds.has(e.eventId)">
+              <i class="pi pi-times-circle"></i> Closed
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+  </div><!-- /dash-body -->
+
+  <!-- ══ Event Detail Drawer ══ -->
+  <div class="drawer-backdrop" *ngIf="selectedEvent" (click)="closeModal()"></div>
+  <div class="drawer" [class.open]="!!selectedEvent" *ngIf="selectedEvent">
+    <div class="drawer-header">
+      <button class="drawer-close" (click)="closeModal()">
+        <i class="pi pi-times"></i>
+      </button>
+      <span class="drawer-label">Event Details</span>
+    </div>
+
+    <!-- Cover image -->
+    <div class="drawer-cover"
+      [style.backgroundImage]="selectedEvent.imageUrl ? 'url(' + getImageUrl(selectedEvent.imageUrl) + ')' : null"
+      [ngClass]="!selectedEvent.imageUrl ? getCardColor(selectedEvent.eventId) : ''">
+      <div class="drawer-cover-overlay"></div>
+      <div class="drawer-cover-badges">
+        <span class="ev-badge" [class.free]="!selectedEvent.paid" [class.paid]="selectedEvent.paid">
+          {{ selectedEvent.paid ? '₹' + selectedEvent.fee : 'FREE' }}
+        </span>
+        <span class="ev-badge date">
+          <i class="pi pi-calendar"></i> {{ formatShortDate(selectedEvent.eventDate) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Drawer body -->
+    <div class="drawer-body">
+      <div class="drawer-club" *ngIf="selectedEvent.club?.clubName">
+        <div class="ev-club-av">{{ selectedEvent.club.clubName.charAt(0) }}</div>
+        {{ selectedEvent.club.clubName }}
+      </div>
+
+      <h2 class="drawer-title">{{ selectedEvent.title }}</h2>
+
+      <div class="drawer-meta">
+        <div class="drawer-meta-item">
+          <i class="pi pi-calendar"></i>
+          <span>{{ formatDate(selectedEvent.eventDate) }}</span>
+        </div>
+        <div class="drawer-meta-item">
+          <i class="pi pi-clock"></i>
+          <span>{{ formatTime(selectedEvent.eventDate) }}</span>
+        </div>
+        <div class="drawer-meta-item" *ngIf="selectedEvent.location">
+          <i class="pi pi-map-marker"></i>
+          <span>{{ selectedEvent.location }}</span>
+        </div>
+        <div class="drawer-meta-item" *ngIf="selectedEvent.capacity">
+          <i class="pi pi-users"></i>
+          <span>{{ selectedEvent.spotsLeft }} / {{ selectedEvent.capacity }} spots left</span>
+        </div>
+      </div>
+
+      <p class="drawer-desc" *ngIf="selectedEvent.description">{{ selectedEvent.description }}</p>
+
+      <div class="drawer-actions">
+        <a [routerLink]="['/student/event', selectedEvent.eventId]" class="btn-secondary" style="flex:1; justify-content:center;">
+          <i class="pi pi-external-link"></i> View Full Details
+        </a>
+        <button
+          *ngIf="!registeredEventIds.has(selectedEvent.eventId) && !selectedEvent.full"
+          class="reg-btn" style="flex:1;"
+          [disabled]="registering.has(selectedEvent.eventId)"
+          (click)="register(selectedEvent.eventId)">
+          <i class="pi pi-bolt" *ngIf="!registering.has(selectedEvent.eventId)"></i>
+          <i class="pi pi-spin pi-spinner" *ngIf="registering.has(selectedEvent.eventId)"></i>
+          {{ registering.has(selectedEvent.eventId) ? 'Registering…' : 'Register Now' }}
+        </button>
+        <div class="btn-registered" style="flex:1;" *ngIf="registeredEventIds.has(selectedEvent.eventId)">
+          <i class="pi pi-check-circle"></i> Registered
+        </div>
+        <div class="btn-full" style="flex:1;" *ngIf="selectedEvent.full && !registeredEventIds.has(selectedEvent.eventId)">
+          <i class="pi pi-lock"></i> Event Full
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

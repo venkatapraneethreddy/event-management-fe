@@ -1,0 +1,86 @@
+<div class="create-club">
+  <div class="page-header">
+    <div>
+      <h1>My Club</h1>
+      <p>Create or view your club profile on EventClub.</p>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="checking"><div class="spinner"></div></div>
+
+  <ng-container *ngIf="!checking">
+
+    <!-- Existing club view -->
+    <ng-container *ngIf="existingClub">
+      <div class="club-hero card stagger-item" [ngClass]="existingClub.status?.toLowerCase()" style="animation-delay:.05s">
+        <div class="club-hero-av">
+          <p-avatar [label]="existingClub.clubName?.charAt(0)" size="xlarge" shape="circle" styleClass="hero-avatar"></p-avatar>
+        </div>
+        <div class="club-hero-info">
+          <h2>{{ existingClub.clubName }}</h2>
+          <p>{{ existingClub.description }}</p>
+          <p-tag
+            [value]="existingClub.status === 'APPROVED' ? 'Active and Approved' : existingClub.status === 'PENDING' ? 'Pending Approval' : 'Rejected'"
+            [severity]="existingClub.status === 'APPROVED' ? 'success' : existingClub.status === 'PENDING' ? 'warn' : 'danger'"
+            styleClass="status-tag"
+          ></p-tag>
+        </div>
+      </div>
+
+      <p-message *ngIf="existingClub.status === 'PENDING'" severity="warn"
+        text="Your club application is under review. You will be notified once an admin approves it."
+        styleClass="w-full mt-4"></p-message>
+      <p-message *ngIf="existingClub.status === 'APPROVED'" severity="success"
+        text="Your club is active. You can now create and publish events from your dashboard."
+        styleClass="w-full mt-4"></p-message>
+      <p-message *ngIf="existingClub.status === 'REJECTED'" severity="error"
+        text="Your club application was rejected. Please contact the administrator for details."
+        styleClass="w-full mt-4"></p-message>
+    </ng-container>
+
+    <!-- Create club form -->
+    <div class="card form-card stagger-item" *ngIf="!existingClub" style="animation-delay:.05s">
+      <div class="form-header">
+        <div class="form-header-icon"><i class="pi pi-building"></i></div>
+        <div>
+          <h2>Create Your Club</h2>
+          <p>Submit your club for admin approval. Once approved, you can organize events.</p>
+        </div>
+      </div>
+
+      <p-message *ngIf="errorMsg" severity="error" [text]="errorMsg" styleClass="w-full mb-4"></p-message>
+      <p-message *ngIf="successMsg" severity="success" [text]="successMsg" styleClass="w-full mb-4"></p-message>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="club-form">
+        <div class="p-field">
+          <label class="field-label">Club Name <span class="req">*</span></label>
+          <p-iconfield class="w-full">
+            <p-inputicon styleClass="pi pi-building" />
+            <input pInputText type="text" formControlName="clubName" placeholder="e.g. Coding Club, Drama Society"
+              class="w-full" [class.ng-invalid]="form.get('clubName')?.invalid && form.get('clubName')?.touched" />
+          </p-iconfield>
+          <small class="p-error" *ngIf="form.get('clubName')?.invalid && form.get('clubName')?.touched">Club name is required.</small>
+        </div>
+
+        <div class="p-field">
+          <label class="field-label">Description <span class="req">*</span></label>
+          <textarea pInputTextarea formControlName="description" rows="4"
+            placeholder="Describe what your club does, its goals, and activities…"
+            class="w-full" [class.ng-invalid]="form.get('description')?.invalid && form.get('description')?.touched"></textarea>
+          <small class="p-error" *ngIf="form.get('description')?.invalid && form.get('description')?.touched">Description is required.</small>
+        </div>
+
+        <div class="info-note">
+          <i class="pi pi-info-circle"></i>
+          <span>Your application will be reviewed by the admin. This typically takes 1–2 business days.</span>
+        </div>
+
+        <div class="form-actions">
+          <p-button type="submit" label="Submit Application" icon="pi pi-send" iconPos="right"
+            [loading]="submitting"></p-button>
+        </div>
+      </form>
+    </div>
+
+  </ng-container>
+</div>

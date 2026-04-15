@@ -1,0 +1,88 @@
+<div class="registrants">
+  <button class="btn-back-nav" (click)="goBack()">
+    <i class="pi pi-arrow-left"></i> My Events
+  </button>
+
+  <div class="page-header">
+    <div>
+      <h1>Registrants</h1>
+      <p>{{ eventTitle }}</p>
+    </div>
+    <p-button label="Export CSV" icon="pi pi-download" severity="secondary" [outlined]="true"
+      [loading]="exportingCsv" [disabled]="registrants.length === 0"
+      (onClick)="exportCsv()"></p-button>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+
+  <ng-container *ngIf="!loading">
+    <div class="stats-row">
+      <div class="stat-card" [class.active]="statusFilter==='ALL'" (click)="statusFilter='ALL'; applyFilter()">
+        <div class="stat-icon brand"><i class="pi pi-users"></i></div>
+        <div><span class="stat-num">{{ registrants.length }}</span><span class="stat-lbl">Total</span></div>
+      </div>
+      <div class="stat-card" [class.active]="statusFilter==='CONFIRMED'" (click)="statusFilter='CONFIRMED'; applyFilter()">
+        <div class="stat-icon green"><i class="pi pi-check-circle"></i></div>
+        <div><span class="stat-num">{{ confirmedCount }}</span><span class="stat-lbl">Confirmed</span></div>
+      </div>
+      <div class="stat-card" [class.active]="statusFilter==='PENDING_PAYMENT'" (click)="statusFilter='PENDING_PAYMENT'; applyFilter()">
+        <div class="stat-icon amber"><i class="pi pi-clock"></i></div>
+        <div><span class="stat-num">{{ pendingCount }}</span><span class="stat-lbl">Pending Payment</span></div>
+      </div>
+      <div class="stat-card" style="cursor:default">
+        <div class="stat-icon violet"><i class="pi pi-check-square"></i></div>
+        <div><span class="stat-num">{{ attendanceCount !== null ? attendanceCount : '…' }}</span><span class="stat-lbl">Checked In</span></div>
+      </div>
+    </div>
+
+    <div class="card table-card" style="padding:0; overflow:hidden;">
+      <div class="tbl-header">
+        <p-iconfield>
+          <p-inputicon styleClass="pi pi-search" />
+          <input pInputText type="text" placeholder="Search by name or email…"
+            [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
+        </p-iconfield>
+        <span class="count-badge">{{ filteredRegistrants.length }} of {{ registrants.length }}</span>
+      </div>
+
+      <p-table [value]="pagedRegistrants" styleClass="p-datatable-sm" [tableStyle]="{'min-width':'600px'}">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width:50px">#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Registered</th>
+            <th>Status</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-reg let-i="rowIndex">
+          <tr>
+            <td class="row-num">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+            <td>
+              <div class="user-cell">
+                <p-avatar [label]="reg.studentName?.charAt(0)" shape="circle" styleClass="user-av"></p-avatar>
+                <span class="user-name">{{ reg.studentName }}</span>
+              </div>
+            </td>
+            <td><span class="user-email">{{ reg.studentEmail }}</span></td>
+            <td><span class="reg-date">{{ formatDate(reg.registeredAt) }}</span></td>
+            <td>
+              <p-tag
+                [value]="reg.status === 'CONFIRMED' ? 'Confirmed' : 'Pending Payment'"
+                [severity]="reg.status === 'CONFIRMED' ? 'success' : 'warning'"
+              ></p-tag>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--n-400)">No registrants match your search.</td></tr>
+        </ng-template>
+      </p-table>
+
+      <div class="tbl-footer">
+        <app-pagination [totalItems]="filteredRegistrants.length" [pageSize]="pageSize"
+          [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+      </div>
+    </div>
+  </ng-container>
+</div>
