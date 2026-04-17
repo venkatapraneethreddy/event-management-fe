@@ -1,4 +1,4 @@
-<!-- src/app/student/dashboard/student-dashboard.component.html -->
+<!-- Student Dashboard — Pro Real-time Design -->
 <div class="dashboard">
 
   <!-- ── Topbar ── -->
@@ -63,16 +63,11 @@
         (click)="filterType='free'; applyFilter()">Free</button>
       <button class="filter-pill" [class.active]="filterType==='paid'"
         (click)="filterType='paid'; applyFilter()">Paid</button>
-
       <div class="filter-divider"></div>
-
       <button class="filter-pill" [class.active]="categoryFilter==='ALL'"
         (click)="categoryFilter='ALL'; applyFilter()">All Types</button>
-      <button
-        *ngFor="let cat of categories"
-        class="filter-pill"
-        [class.active]="categoryFilter===cat"
-        (click)="categoryFilter=cat; applyFilter()">
+      <button *ngFor="let cat of categories" class="filter-pill"
+        [class.active]="categoryFilter===cat" (click)="categoryFilter=cat; applyFilter()">
         {{ cat | titlecase }}
       </button>
     </div>
@@ -80,7 +75,7 @@
     <!-- ── Loading skeletons ── -->
     <ng-container *ngIf="loading">
       <div class="ev-grid">
-        <p-skeleton *ngFor="let i of [1,2,3,4,5,6]" height="320px" borderRadius="20px"></p-skeleton>
+        <p-skeleton *ngFor="let i of [1,2,3,4,5,6]" height="340px" borderRadius="22px"></p-skeleton>
       </div>
     </ng-container>
 
@@ -96,7 +91,7 @@
           class="ev-card stagger-item"
           (click)="openModal(e)"
           *ngFor="let e of upcomingEvents; let i = index"
-          [style.animation-delay]="(i * 0.055) + 's'"
+          [style.animation-delay]="(i * 0.06) + 's'"
           [class.full]="e.full"
           [class.registered-card]="registeredEventIds.has(e.eventId)"
           [class.almost-full]="isAlmostFull(e)"
@@ -109,24 +104,37 @@
             <div class="ev-img-inner" *ngIf="e.imageUrl"
               [style.backgroundImage]="'url(' + getImageUrl(e.imageUrl) + ')'"></div>
 
+            <!-- Date chip -->
+            <div class="ev-date-chip" *ngIf="e.eventDate">
+              <span class="ev-date-day">{{ getDay(e.eventDate) }}</span>
+              <span class="ev-date-mon">{{ getMonth(e.eventDate) }}</span>
+            </div>
+
+            <!-- Category badge -->
+            <span class="ev-cat" *ngIf="e.category && e.category !== 'OTHER'">{{ e.category | titlecase }}</span>
+
+            <!-- Mid-image badges -->
             <div class="ev-img-badges">
-              <span class="ev-badge date" *ngIf="e.eventDate">
-                <i class="pi pi-calendar"></i> {{ formatShortDate(e.eventDate) }}
-              </span>
               <span class="ev-badge" [class.free]="!e.paid" [class.paid]="e.paid">
                 {{ e.paid ? '₹' + e.fee : 'FREE' }}
               </span>
               <span class="ev-badge warn" *ngIf="isAlmostFull(e) && !e.full">
                 <i class="pi pi-bolt"></i> Almost Full
               </span>
-              <span class="ev-badge today" *ngIf="isToday(e.eventDate)">
-                <i class="pi pi-star-fill"></i> Today
-              </span>
               <span class="ev-badge registered" *ngIf="registeredEventIds.has(e.eventId)">
                 <i class="pi pi-check-circle"></i> Joined
               </span>
+              <!-- Live dot for today -->
+              <span class="live-badge" *ngIf="isToday(e.eventDate)">
+                <span class="live-dot"></span> TODAY
+              </span>
             </div>
-            <span class="ev-cat" *ngIf="e.category && e.category !== 'OTHER'">{{ e.category | titlecase }}</span>
+
+            <!-- Time + location bar -->
+            <div class="ev-time-bar">
+              <span class="ev-time"><i class="pi pi-clock"></i>{{ formatTime(e.eventDate) }}</span>
+              <span class="ev-location"><i class="pi pi-map-marker"></i>{{ e.location || 'TBA' }}</span>
+            </div>
           </div>
 
           <!-- Body -->
@@ -138,11 +146,6 @@
 
             <div class="ev-title">
               <a [routerLink]="['/student/event', e.eventId]" (click)="$event.stopPropagation()">{{ e.title }}</a>
-            </div>
-
-            <div class="ev-meta">
-              <span><i class="pi pi-clock"></i>{{ formatTime(e.eventDate) }}</span>
-              <span><i class="pi pi-map-marker"></i>{{ e.location || 'TBA' }}</span>
             </div>
 
             <div class="spots-wrap" *ngIf="e.capacity">
@@ -214,16 +217,12 @@
       <div class="ev-grid past-grid" *ngIf="showPast">
         <div class="ev-card past" *ngFor="let e of pastEvents">
           <div class="ev-img" [ngClass]="getCardColor(e.eventId)" style="opacity:.4">
-            <div class="ev-img-badges">
-              <span class="ev-badge date">Ended</span>
+            <div class="ev-time-bar">
+              <span class="ev-time" style="opacity:.5">Ended</span>
             </div>
           </div>
           <div class="ev-body">
             <div class="ev-title">{{ e.title }}</div>
-            <div class="ev-meta">
-              <span><i class="pi pi-calendar"></i>{{ formatDate(e.eventDate) }}</span>
-              <span><i class="pi pi-map-marker"></i>{{ e.location || 'TBA' }}</span>
-            </div>
           </div>
           <div class="ev-foot">
             <div class="btn-registered" *ngIf="registeredEventIds.has(e.eventId)">
@@ -258,8 +257,8 @@
         <span class="ev-badge" [class.free]="!selectedEvent.paid" [class.paid]="selectedEvent.paid">
           {{ selectedEvent.paid ? '₹' + selectedEvent.fee : 'FREE' }}
         </span>
-        <span class="ev-badge date">
-          <i class="pi pi-calendar"></i> {{ formatShortDate(selectedEvent.eventDate) }}
+        <span class="live-badge" *ngIf="isToday(selectedEvent.eventDate)">
+          <span class="live-dot"></span> TODAY
         </span>
       </div>
     </div>

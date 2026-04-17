@@ -1,31 +1,190 @@
+/* src/app/admin/users/admin-users.component.scss */
 :host { display: block; }
-@keyframes pageFadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-@keyframes staggerIn  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-.stagger-item { opacity:0; animation: staggerIn .32s cubic-bezier(.4,0,.2,1) forwards; }
-.users-page { animation: pageFadeIn .28s cubic-bezier(.4,0,.2,1) both; }
-.page-header { margin-bottom:24px; h1 { font-size:22px; font-weight:700; color:var(--n-800); letter-spacing:-.025em; } p { font-size:13.5px; color:var(--n-400); margin-top:4px; } }
-.loading-state { display:flex; justify-content:center; padding:80px; }
-.spinner { width:20px; height:20px; border-radius:50%; border:2.5px solid var(--border-2); border-top-color:var(--brand); animation:spin .7s linear infinite; }
-@keyframes spin { to { transform:rotate(360deg); } }
 
-.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; @media (max-width:640px) { grid-template-columns:repeat(2,1fr); } }
-.stat-card {
-  background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r-lg); padding:18px 20px; cursor:pointer; transition:all var(--ease-fast); display:flex; align-items:center; gap:14px;
-  .stat-icon { width:40px; height:40px; border-radius:var(--r-md); display:flex; align-items:center; justify-content:center; i { font-size:18px; }
-    &.all      { background:var(--brand-bg); i { color:var(--brand); } }
-    &.student  { background:#eff6ff; i { color:#3b82f6; } }
-    &.organizer{ background:#f5f3ff; i { color:#7c3aed; } }
-    &.admin    { background:var(--danger-bg); i { color:var(--danger); } } }
-  .stat-num { display:block; font-size:22px; font-weight:800; color:var(--n-800); letter-spacing:-.04em; line-height:1; }
-  .stat-lbl { display:block; font-size:12px; color:var(--n-400); font-weight:500; margin-top:2px; }
-  &:hover { box-shadow:var(--sh-md); border-color:var(--n-300); }
-  &.active { border-color:var(--brand); background:var(--brand-bg); .stat-num { color:var(--brand); } }
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes staggerIn {
+  from { opacity: 0; transform: translateY(10px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.stagger-item {
+  opacity: 0;
+  animation: staggerIn .32s cubic-bezier(.16,1,.3,1) forwards;
 }
 
-.tbl-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
-.count-badge { font-size:12.5px; color:var(--n-400); font-weight:500; }
-.user-cell { display:flex; align-items:center; gap:10px; }
-::ng-deep .user-av { background:var(--brand-bg) !important; color:var(--brand) !important; font-weight:700 !important; }
-.user-name  { font-size:14px; font-weight:600; color:var(--n-800); }
-.user-email { font-size:13px; color:var(--n-400); }
-.user-date  { font-size:12.5px; color:var(--n-500); }
+.users-page {
+  min-height: 100vh;
+  padding: 28px 32px;
+  max-width: 1260px; margin: 0 auto;
+  animation: pageFadeIn .3s cubic-bezier(.16,1,.3,1) both;
+
+  @media (max-width: 768px) { padding: 20px 16px; }
+}
+
+/* ── Page Header ── */
+.page-header {
+  margin-bottom: 24px;
+  h1 {
+    font-size: 24px; font-weight: 800;
+    color: #f1f5f9; letter-spacing: -.04em;
+  }
+  p { font-size: 13.5px; color: rgba(255,255,255,.38); margin-top: 5px; }
+}
+
+/* ── Loading ── */
+.loading-state {
+  display: flex; justify-content: center;
+  align-items: center; padding: 80px; gap: 14px;
+  color: rgba(255,255,255,.35); font-size: 14px;
+}
+.spinner {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,.1); border-top-color: #6366f1;
+  animation: spin .7s linear infinite;
+}
+
+/* ── Stats row ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px; margin-bottom: 20px;
+
+  @media (max-width: 640px) { grid-template-columns: repeat(2, 1fr); }
+}
+
+.stat-card {
+  background: rgba(255,255,255,.04);
+  border: 1.5px solid rgba(255,255,255,.08);
+  border-radius: 16px; padding: 18px 20px;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(.16,1,.3,1);
+  display: flex; align-items: center; gap: 14px;
+  position: relative; overflow: hidden;
+
+  &::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at top right, var(--sc-glow, transparent), transparent 65%);
+    opacity: 0; transition: opacity .3s;
+  }
+  &:hover {
+    border-color: rgba(255,255,255,.15);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,0,0,.4);
+    &::before { opacity: 1; }
+  }
+  &.active {
+    border-color: var(--sc-border, rgba(99,102,241,.45));
+    background: var(--sc-bg, rgba(99,102,241,.1));
+    .stat-num { color: var(--sc-color, #a5b4fc); }
+  }
+
+  .stat-icon {
+    width: 44px; height: 44px; border-radius: 13px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    i { font-size: 19px; }
+
+    &.all {
+      background: rgba(99,102,241,.15); i { color: #a5b4fc; }
+    }
+    &.student {
+      background: rgba(56,189,248,.15); i { color: #38bdf8; }
+    }
+    &.organizer {
+      background: rgba(124,58,237,.15); i { color: #c4b5fd; }
+    }
+    &.admin {
+      background: rgba(239,68,68,.15); i { color: #fca5a5; }
+    }
+  }
+
+  // Color tokens per type
+  &:has(.stat-icon.all)      { --sc-glow: rgba(99,102,241,.18); --sc-border: rgba(99,102,241,.4); --sc-bg: rgba(99,102,241,.1); --sc-color: #a5b4fc; }
+  &:has(.stat-icon.student)  { --sc-glow: rgba(56,189,248,.18); --sc-border: rgba(56,189,248,.4); --sc-bg: rgba(56,189,248,.1); --sc-color: #38bdf8; }
+  &:has(.stat-icon.organizer){ --sc-glow: rgba(124,58,237,.18); --sc-border: rgba(124,58,237,.4); --sc-bg: rgba(124,58,237,.1); --sc-color: #c4b5fd; }
+  &:has(.stat-icon.admin)    { --sc-glow: rgba(239,68,68,.18);  --sc-border: rgba(239,68,68,.4);  --sc-bg: rgba(239,68,68,.1);  --sc-color: #fca5a5; }
+
+  .stat-num {
+    display: block; font-size: 24px; font-weight: 900;
+    color: #f1f5f9; letter-spacing: -.05em; line-height: 1;
+    transition: color .2s;
+  }
+  .stat-lbl {
+    display: block; font-size: 12px;
+    color: rgba(255,255,255,.35); font-weight: 500; margin-top: 3px;
+  }
+}
+
+/* ── Table card ── */
+.card.table-card {
+  background: rgba(255,255,255,.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.4);
+}
+
+.tbl-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  flex-wrap: wrap;
+}
+.count-badge {
+  font-size: 12.5px; color: rgba(255,255,255,.35); font-weight: 500;
+}
+
+/* PrimeNG table dark-mode overrides */
+::ng-deep {
+  .users-page .p-datatable .p-datatable-thead > tr > th {
+    background: rgba(255,255,255,.03) !important;
+    border-color: rgba(255,255,255,.07) !important;
+    color: rgba(255,255,255,.45) !important;
+    font-size: 11px !important; font-weight: 800 !important;
+    letter-spacing: .07em !important; text-transform: uppercase !important;
+    padding: 11px 14px !important;
+  }
+  .users-page .p-datatable .p-datatable-tbody > tr > td {
+    background: transparent !important;
+    border-color: rgba(255,255,255,.05) !important;
+    color: rgba(255,255,255,.75) !important;
+    padding: 12px 14px !important;
+  }
+  .users-page .p-datatable .p-datatable-tbody > tr {
+    transition: background .2s;
+    &:hover > td { background: rgba(255,255,255,.04) !important; }
+  }
+  // Icon field search input
+  .users-page .p-iconfield .p-inputtext {
+    background: rgba(255,255,255,.07) !important;
+    border: 1.5px solid rgba(255,255,255,.1) !important;
+    border-radius: 11px !important;
+    color: #e2e8f0 !important;
+    font-family: var(--font, 'Inter', sans-serif) !important;
+    font-size: 13.5px !important;
+    padding: 10px 14px 10px 40px !important;
+    min-width: 280px;
+    &::placeholder { color: rgba(255,255,255,.28) !important; }
+    &:focus {
+      background: rgba(255,255,255,.1) !important;
+      border-color: rgba(99,102,241,.55) !important;
+      box-shadow: 0 0 0 3px rgba(99,102,241,.12) !important;
+    }
+  }
+  .users-page .p-iconfield .p-inputicon { color: rgba(255,255,255,.3) !important; }
+}
+
+/* ── User cell ── */
+.user-cell { display: flex; align-items: center; gap: 10px; }
+
+::ng-deep .user-av {
+  background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+  color: #fff !important; font-weight: 800 !important;
+}
+
+.user-name  { font-size: 14px; font-weight: 600; color: #f1f5f9; }
+.user-email { font-size: 13px; color: rgba(255,255,255,.38); }
+.user-date  { font-size: 12.5px; color: rgba(255,255,255,.3); }

@@ -1,106 +1,219 @@
+<!-- Event Detail — Full Dark Pro Page -->
 <div class="event-detail">
-  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
 
-  <div class="card not-found" *ngIf="notFound">
-    <i class="pi pi-search-minus" style="font-size:2.5rem;color:var(--n-300);display:block;margin-bottom:16px"></i>
+  <!-- Loading -->
+  <div class="loading-wrap" *ngIf="loading">
+    <div class="load-spinner"></div>
+    <p>Loading event…</p>
+  </div>
+
+  <!-- Not found -->
+  <div class="not-found-card" *ngIf="notFound">
+    <i class="pi pi-search-minus"></i>
     <h2>Event Not Found</h2>
     <p>This event may have been removed or is no longer available.</p>
-    <p-button label="Back to Events" icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()" styleClass="mt-3"></p-button>
+    <button class="btn-back" (click)="goBack()">
+      <i class="pi pi-arrow-left"></i> Back to Events
+    </button>
   </div>
 
   <ng-container *ngIf="!loading && event">
+
+    <!-- Back button -->
     <button class="btn-back-nav" (click)="goBack()">
       <i class="pi pi-arrow-left"></i> Back to Events
     </button>
 
-    <div class="detail-grid">
+    <!-- ── Full-width Hero Banner ── -->
+    <div class="hero-banner" [ngClass]="getBannerColor(event.eventId)"
+      [style.backgroundImage]="event.imageUrl ? 'url(' + getImageUrl(event.imageUrl) + ')' : null"
+      [class.has-image]="!!event.imageUrl">
+      <div class="hero-particles">
+        <span class="hp hp1"></span><span class="hp hp2"></span><span class="hp hp3"></span>
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="hero-inner">
+        <div class="hero-badges">
+          <span class="h-badge" [class.free]="!event.paid" [class.paid]="event.paid">
+            {{ event.paid ? '₹' + event.fee : 'Free Entry' }}
+          </span>
+          <span class="h-badge ended" *ngIf="isPastEvent()">Event Ended</span>
+          <span class="h-badge sold-out" *ngIf="event.full && !isPastEvent()">Sold Out</span>
+          <span class="h-badge live" *ngIf="isLiveNow()">
+            <span class="live-dot"></span> Live Now
+          </span>
+        </div>
+        <div class="hero-cat" *ngIf="event.category && event.category !== 'OTHER'">{{ event.category }}</div>
+        <h1 class="hero-title">{{ event.title }}</h1>
+        <p class="hero-club" *ngIf="event.club?.clubName">
+          <i class="pi pi-building"></i> {{ event.club.clubName }}
+        </p>
+      </div>
+    </div>
 
-      <!-- Main content -->
+    <!-- ── Content Grid ── -->
+    <div class="content-grid">
+
+      <!-- Left: About + Schedule -->
       <div class="main-col">
 
-        <!-- Hero -->
-        <div class="hero-banner" [ngClass]="getBannerColor(event.eventId)">
-          <div class="hero-overlay"></div>
-          <div class="hero-content">
-            <div class="hero-badges">
-              <p-tag [value]="event.paid ? '₹' + event.fee : 'Free Entry'" [severity]="event.paid ? 'warning' : 'success'" styleClass="hero-tag"></p-tag>
-              <p-tag *ngIf="isPastEvent()" value="Event Ended" severity="secondary" styleClass="hero-tag"></p-tag>
-              <p-tag *ngIf="event.full && !isPastEvent()" value="Sold Out" severity="danger" styleClass="hero-tag"></p-tag>
-            </div>
-            <h1>{{ event.title }}</h1>
-            <p class="hero-club" *ngIf="event.club?.clubName">
-              <i class="pi pi-building"></i> Organized by <strong>{{ event.club.clubName }}</strong>
-            </p>
+        <!-- About Card -->
+        <div class="glass-card desc-card">
+          <div class="card-head">
+            <div class="card-head-icon"><i class="pi pi-info-circle"></i></div>
+            <h3>About This Event</h3>
           </div>
+          <p class="description">{{ event.description || 'No description provided.' }}</p>
         </div>
 
-        <!-- Description -->
-        <div class="card desc-card">
-          <h3><i class="pi pi-info-circle"></i> About This Event</h3>
-          <p class="description">{{ event.description || 'No description provided.' }}</p>
+        <!-- Schedule / Meta Card -->
+        <div class="glass-card schedule-card">
+          <div class="card-head">
+            <div class="card-head-icon"><i class="pi pi-calendar"></i></div>
+            <h3>Event Details</h3>
+          </div>
+          <div class="schedule-grid">
+            <div class="sched-item">
+              <i class="pi pi-calendar-clock"></i>
+              <div>
+                <div class="sched-lbl">Date & Time</div>
+                <div class="sched-val">{{ formatDate(event.eventDate) }}</div>
+              </div>
+            </div>
+            <div class="sched-item">
+              <i class="pi pi-map-marker"></i>
+              <div>
+                <div class="sched-lbl">Location</div>
+                <div class="sched-val">{{ event.location || 'To be announced' }}</div>
+              </div>
+            </div>
+            <div class="sched-item" *ngIf="event.capacity">
+              <i class="pi pi-users"></i>
+              <div>
+                <div class="sched-lbl">Capacity</div>
+                <div class="sched-val">
+                  {{ event.capacity }} attendees
+                  <span class="spots-badge" [class.danger]="event.full" [class.warn]="!event.full && event.spotsLeft <= event.capacity * 0.1">
+                    {{ event.full ? 'Full' : event.spotsLeft + ' left' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="sched-item" *ngIf="event.paid">
+              <i class="pi pi-indian-rupee"></i>
+              <div>
+                <div class="sched-lbl">Registration Fee</div>
+                <div class="sched-val fee-val">₹{{ event.fee }}</div>
+              </div>
+            </div>
+            <div class="sched-item" *ngIf="event.club?.clubName">
+              <i class="pi pi-building"></i>
+              <div>
+                <div class="sched-lbl">Organizer</div>
+                <div class="sched-val">{{ event.club.clubName }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Availability bar -->
+          <div class="avail-section" *ngIf="event.capacity && !event.full">
+            <div class="avail-header">
+              <span>Availability</span>
+              <span class="avail-pct">{{ getCapacityPercent() }}% filled</span>
+            </div>
+            <div class="avail-track">
+              <div class="avail-fill"
+                [class.warn]="getCapacityPercent() > 70"
+                [class.danger]="getCapacityPercent() > 90"
+                [style.width]="getCapacityPercent() + '%'">
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
 
-      <!-- Sidebar -->
+      <!-- Right: Registration CTA -->
       <div class="side-col">
-        <div class="card info-card">
-          <h3 class="info-title">Event Details</h3>
+        <div class="glass-card cta-card" [class.registered]="alreadyRegistered" [class.ended]="isPastEvent()">
 
-          <div class="info-rows">
-            <div class="info-row">
-              <div class="info-icon-wrap"><i class="pi pi-calendar"></i></div>
-              <div><div class="info-lbl">Date &amp; Time</div><div class="info-val">{{ formatDate(event.eventDate) }}</div></div>
+          <!-- CTA header -->
+          <div class="cta-header">
+            <div class="cta-price" *ngIf="!isPastEvent()">
+              <span class="price-val" [class.free]="!event.paid">{{ event.paid ? '₹' + event.fee : 'Free' }}</span>
+              <span class="price-lbl">{{ event.paid ? 'registration fee' : 'entry' }}</span>
             </div>
-            <div class="info-row">
-              <div class="info-icon-wrap"><i class="pi pi-map-marker"></i></div>
-              <div><div class="info-lbl">Location</div><div class="info-val">{{ event.location || 'To be announced' }}</div></div>
-            </div>
-            <div class="info-row" *ngIf="event.capacity">
-              <div class="info-icon-wrap"><i class="pi pi-users"></i></div>
-              <div>
-                <div class="info-lbl">Availability</div>
-                <div class="info-val">
-                  <span class="spots-txt" [class.ok]="!event.full && event.spotsLeft > event.capacity * 0.1"
-                    [class.low]="!event.full && event.spotsLeft <= event.capacity * 0.1"
-                    [class.full-txt]="event.full">
-                    {{ event.full ? 'Sold Out' : event.spotsLeft + ' of ' + event.capacity + ' spots left' }}
-                  </span>
-                  <p-progressbar *ngIf="!event.full" [value]="((event.capacity - event.spotsLeft) / event.capacity) * 100"
-                    styleClass="avail-bar"></p-progressbar>
-                </div>
-              </div>
-            </div>
-            <div class="info-row" *ngIf="event.paid">
-              <div class="info-icon-wrap"><i class="pi pi-indian-rupee"></i></div>
-              <div><div class="info-lbl">Registration Fee</div><div class="info-val fee-val">₹{{ event.fee }}</div></div>
+            <div class="cta-price" *ngIf="isPastEvent()">
+              <span class="price-val ended-txt">Event Ended</span>
             </div>
           </div>
 
-          <p-divider></p-divider>
-
-          <!-- CTA -->
-          <div class="info-cta">
-            <p-button
-              *ngIf="!alreadyRegistered && !isPastEvent() && !event.full"
-              [label]="event.paid ? 'Register & Pay ₹' + event.fee : 'Register — Free'"
-              icon="pi pi-arrow-right" iconPos="right"
-              [loading]="registering"
-              (onClick)="register()"
-              styleClass="w-full cta-register"
-            ></p-button>
-
-            <div class="full-msg" *ngIf="event.full && !alreadyRegistered">
-              <i class="pi pi-lock"></i> This event is fully booked
+          <!-- Already registered -->
+          <div class="registered-box" *ngIf="alreadyRegistered">
+            <div class="reg-icon-wrap"><i class="pi pi-check-circle"></i></div>
+            <div class="reg-text">
+              <strong>You're Registered!</strong>
+              <span>Check My Registrations for your ticket.</span>
             </div>
+          </div>
 
-            <div class="registered-box" *ngIf="alreadyRegistered">
-              <div class="reg-check"><i class="pi pi-check-circle"></i></div>
-              <div><strong>You're Registered!</strong><span>Check My Registrations for your ticket.</span></div>
+          <!-- Register CTA -->
+          <button class="cta-register-btn"
+            *ngIf="!alreadyRegistered && !isPastEvent() && !event.full"
+            [disabled]="registering"
+            (click)="register()">
+            <span class="cta-btn-glow"></span>
+            <i class="pi" [class.pi-bolt]="!registering" [class.pi-spin]="registering" [class.pi-spinner]="registering"></i>
+            {{ registering ? 'Processing…' : (event.paid ? 'Register & Pay ₹' + event.fee : 'Register — Free') }}
+            <i class="pi pi-arrow-right" *ngIf="!registering"></i>
+          </button>
+
+          <!-- Sold out -->
+          <div class="sold-out-box" *ngIf="event.full && !alreadyRegistered">
+            <i class="pi pi-lock"></i>
+            <span>This event is fully booked</span>
+          </div>
+
+          <!-- Ended -->
+          <div class="ended-box" *ngIf="isPastEvent()">
+            <i class="pi pi-clock"></i>
+            <span>Registration is closed</span>
+          </div>
+
+          <!-- Info pills -->
+          <div class="cta-info-pills" *ngIf="!isPastEvent()">
+            <div class="info-pill">
+              <i class="pi pi-shield"></i> Secure registration
             </div>
+            <div class="info-pill" *ngIf="event.capacity && !event.full">
+              <i class="pi pi-users"></i> {{ event.spotsLeft }} spots left
+            </div>
+          </div>
+        </div>
 
-            <div class="ended-msg" *ngIf="isPastEvent()">
-              <i class="pi pi-clock"></i> Registration closed
+        <!-- Quick info card -->
+        <div class="glass-card quick-info">
+          <div class="qi-item">
+            <i class="pi pi-calendar"></i>
+            <div>
+              <div class="qi-lbl">Date</div>
+              <div class="qi-val">{{ formatShortDate(event.eventDate) }}</div>
+            </div>
+          </div>
+          <div class="qi-sep"></div>
+          <div class="qi-item">
+            <i class="pi pi-clock"></i>
+            <div>
+              <div class="qi-lbl">Time</div>
+              <div class="qi-val">{{ formatTime(event.eventDate) }}</div>
+            </div>
+          </div>
+          <div class="qi-sep"></div>
+          <div class="qi-item">
+            <i class="pi pi-map-marker"></i>
+            <div>
+              <div class="qi-lbl">Venue</div>
+              <div class="qi-val">{{ event.location || 'TBA' }}</div>
             </div>
           </div>
         </div>

@@ -1,3 +1,4 @@
+<!-- src/app/shared/profile/profile.component.html -->
 <div class="profile-page">
   <div class="page-header">
     <div>
@@ -6,17 +7,20 @@
     </div>
   </div>
 
-  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>Loading profile…</span>
+  </div>
 
   <ng-container *ngIf="!loading">
 
-    <p-message *ngIf="nameSuccess" severity="success" [text]="nameSuccess" styleClass="w-full mb-4"></p-message>
+    <p-message *ngIf="nameSuccess"     severity="success" [text]="nameSuccess"     styleClass="w-full mb-4"></p-message>
     <p-message *ngIf="passwordSuccess" severity="success" [text]="passwordSuccess" styleClass="w-full mb-4"></p-message>
-    <p-message *ngIf="passwordError" severity="error" [text]="passwordError" styleClass="w-full mb-4"></p-message>
+    <p-message *ngIf="passwordError"   severity="error"   [text]="passwordError"   styleClass="w-full mb-4"></p-message>
 
     <div class="profile-grid">
 
-      <!-- Profile card -->
+      <!-- ── Profile Summary Card ── -->
       <div class="card profile-card stagger-item" style="animation-delay:.05s">
         <div class="avatar-section">
           <div class="avatar-ring">
@@ -35,11 +39,24 @@
           ></p-tag>
           <p class="email">{{ profile?.email }}</p>
         </div>
+
+        <div class="profile-meta">
+          <div class="meta-row">
+            <i class="pi pi-envelope"></i>
+            <span>{{ profile?.email }}</span>
+          </div>
+          <div class="meta-row">
+            <i class="pi pi-id-card"></i>
+            <span>{{ profile?.role | titlecase }}</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Edit form -->
+      <!-- ── Edit Forms Card ── -->
       <div class="card form-card stagger-item" style="animation-delay:.1s">
-        <h3 class="form-title">Personal Information</h3>
+
+        <!-- Personal Info -->
+        <h3 class="form-title"><i class="pi pi-user"></i> Personal Information</h3>
         <form [formGroup]="nameForm" (ngSubmit)="saveName()" class="profile-form">
           <div class="p-field">
             <label class="field-label">Full Name</label>
@@ -49,12 +66,12 @@
             </p-iconfield>
           </div>
           <div class="p-field">
-            <label class="field-label">Email</label>
+            <label class="field-label">Email Address</label>
             <p-iconfield class="w-full">
               <p-inputicon styleClass="pi pi-envelope" />
               <input pInputText type="email" class="w-full" [readonly]="true" [value]="profile?.email || ''" />
             </p-iconfield>
-            <small style="color:var(--n-400);font-size:12px">Email cannot be changed.</small>
+            <small style="color:rgba(255,255,255,.3); font-size:11.5px">Email cannot be changed.</small>
           </div>
           <div class="form-actions">
             <p-button type="submit" label="Save Changes" icon="pi pi-check" [loading]="savingName"></p-button>
@@ -63,7 +80,8 @@
 
         <p-divider></p-divider>
 
-        <h3 class="form-title">Change Password</h3>
+        <!-- Change Password -->
+        <h3 class="form-title"><i class="pi pi-lock"></i> Change Password</h3>
         <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="profile-form">
           <div class="p-field">
             <label class="field-label">Current Password</label>
@@ -74,7 +92,7 @@
             <input pInputText type="password" formControlName="newPassword" class="w-full" placeholder="At least 6 characters" />
           </div>
           <div class="p-field">
-            <label class="field-label">Confirm Password</label>
+            <label class="field-label">Confirm New Password</label>
             <input pInputText type="password" formControlName="confirmPassword" class="w-full" placeholder="Re-enter new password" />
             <small class="p-error" *ngIf="passwordForm.hasError('mismatch') && passwordForm.touched">Passwords do not match.</small>
           </div>
@@ -82,6 +100,7 @@
             <p-button type="submit" label="Update Password" icon="pi pi-lock" severity="secondary" [loading]="savingPassword"></p-button>
           </div>
         </form>
+
       </div>
     </div>
   </ng-container>

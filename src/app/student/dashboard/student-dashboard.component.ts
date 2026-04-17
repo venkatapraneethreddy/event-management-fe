@@ -211,7 +211,15 @@ isAlmostFull(e: any): boolean {
   return !e.full && this.getCapacityPercent(e) >= 75;
 }
 
-isToday(date: string): boolean {
+getDay(date: string): string {
+    if (!date) return "";
+    return new Date(date).getDate().toString();
+  }
+  getMonth(date: string): string {
+    if (!date) return "";
+    return new Date(date).toLocaleDateString("en-IN", { month: "short" }).toUpperCase();
+  }
+  isToday(date: string): boolean {
   if (!date) return false;
 
   const d = new Date(date);
@@ -222,3 +230,5 @@ isToday(date: string): boolean {
     && d.getFullYear() === now.getFullYear();
 }
 }
+
+// Add to the class - helper methods for new date chip

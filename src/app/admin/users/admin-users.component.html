@@ -6,7 +6,10 @@
     </div>
   </div>
 
-  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>Loading users…</span>
+  </div>
 
   <ng-container *ngIf="!loading">
     <div class="stats-row">
@@ -65,7 +68,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
-          <tr><td colspan="4" style="text-align:center; padding:40px; color:var(--n-400)">No users match your search.</td></tr>
+          <tr><td colspan="4" style="text-align:center; padding:40px; color:rgba(255,255,255,.35)">No users match your search.</td></tr>
         </ng-template>
       </p-table>
     </div>

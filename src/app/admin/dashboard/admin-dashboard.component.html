@@ -1,6 +1,4 @@
-<!-- src/app/admin/dashboard/admin-dashboard.component.html -->
 <div class="admin-dash">
-
   <div class="topbar">
     <span class="topbar-title">Administration Panel</span>
   </div>
@@ -13,122 +11,114 @@
       </div>
     </div>
 
-    <!-- Loading skeletons -->
+    <!-- Loading -->
     <ng-container *ngIf="loading">
       <div class="kpi-row">
-        <p-skeleton *ngFor="let i of [1,2,3,4,5]" height="98px" borderRadius="20px"></p-skeleton>
+        <p-skeleton *ngFor="let i of [1,2,3,4,5]" height="96px" borderRadius="20px"></p-skeleton>
       </div>
       <p-skeleton height="320px" borderRadius="18px" styleClass="mt-4"></p-skeleton>
     </ng-container>
 
     <ng-container *ngIf="!loading">
 
-      <!-- KPI cards -->
+      <!-- KPI Cards -->
       <div class="kpi-row">
         <div class="kpi-card blue stagger-item" style="animation-delay:.05s">
           <div class="kpi-icon-wrap blue"><i class="pi pi-graduation-cap"></i></div>
-          <div class="kpi-body">
-            <div class="kpi-num">{{ stats.totalUsers }}</div>
-            <div class="kpi-lbl">Total Students</div>
-          </div>
-          <span class="kpi-trend">+12%</span>
+          <div class="kpi-body"><div class="kpi-num">{{ stats.totalUsers }}</div><div class="kpi-lbl">Total Students</div></div>
+          <span class="kpi-trend up">+12%</span>
         </div>
-
         <div class="kpi-card violet stagger-item" style="animation-delay:.1s">
           <div class="kpi-icon-wrap violet"><i class="pi pi-building"></i></div>
-          <div class="kpi-body">
-            <div class="kpi-num">{{ stats.totalClubs }}</div>
-            <div class="kpi-lbl">Total Clubs</div>
-          </div>
-          <span class="kpi-trend">+5%</span>
+          <div class="kpi-body"><div class="kpi-num">{{ stats.totalClubs }}</div><div class="kpi-lbl">Total Clubs</div></div>
+          <span class="kpi-trend up">+5%</span>
         </div>
-
         <div class="kpi-card green stagger-item" style="animation-delay:.15s">
           <div class="kpi-icon-wrap green"><i class="pi pi-calendar"></i></div>
-          <div class="kpi-body">
-            <div class="kpi-num">{{ stats.totalEvents }}</div>
-            <div class="kpi-lbl">Active Events</div>
-          </div>
-          <span class="kpi-trend">+8%</span>
+          <div class="kpi-body"><div class="kpi-num">{{ stats.totalEvents }}</div><div class="kpi-lbl">Active Events</div></div>
+          <span class="kpi-trend up">+8%</span>
         </div>
-
-        <div class="kpi-card amber stagger-item"
-          [class.pending-highlight]="stats.pendingClubs > 0"
-          style="animation-delay:.2s">
+        <div class="kpi-card amber stagger-item" [class.pending-highlight]="stats.pendingClubs > 0" style="animation-delay:.2s">
           <div class="kpi-icon-wrap amber"><i class="pi pi-clock"></i></div>
           <div class="kpi-body">
-            <div class="kpi-num" [style.color]="stats.pendingClubs > 0 ? '#fcd34d' : 'inherit'">
-              {{ stats.pendingClubs }}
-            </div>
+            <div class="kpi-num" [style.color]="stats.pendingClubs > 0 ? '#fcd34d' : 'inherit'">{{ stats.pendingClubs }}</div>
             <div class="kpi-lbl">Pending Approvals</div>
           </div>
           <a *ngIf="stats.pendingClubs > 0" routerLink="/admin/club-approvals" class="kpi-action">
             Review <i class="pi pi-arrow-right"></i>
           </a>
         </div>
-
         <div class="kpi-card rose stagger-item" style="animation-delay:.25s">
           <div class="kpi-icon-wrap rose"><i class="pi pi-ticket"></i></div>
-          <div class="kpi-body">
-            <div class="kpi-num">{{ stats.totalRegistrations }}</div>
-            <div class="kpi-lbl">Registrations</div>
+          <div class="kpi-body"><div class="kpi-num">{{ stats.totalRegistrations }}</div><div class="kpi-lbl">Registrations</div></div>
+          <span class="kpi-trend up">+18%</span>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-row stagger-item" style="animation-delay:.3s">
+        <div class="chart-card wide">
+          <div class="chart-head">
+            <div class="ch-icon blue"><i class="pi pi-chart-bar"></i></div>
+            <div>
+              <div class="ch-title">Platform Overview</div>
+              <div class="ch-sub">Users, events, registrations</div>
+            </div>
           </div>
-          <span class="kpi-trend">+18%</span>
+          <div class="canvas-wrap bar-h">
+            <canvas #barCanvas></canvas>
+          </div>
+        </div>
+        <div class="chart-card donut-card">
+          <div class="chart-head">
+            <div class="ch-icon violet"><i class="pi pi-building"></i></div>
+            <div>
+              <div class="ch-title">Club Status</div>
+              <div class="ch-sub">Approved vs pending</div>
+            </div>
+          </div>
+          <div class="canvas-wrap donut-h">
+            <canvas #donutCanvas></canvas>
+          </div>
         </div>
       </div>
 
-      <!-- Charts row -->
-      <div class="analytics-grid stagger-item" style="animation-delay:.3s">
-        <div class="chart-card">
-          <div class="chart-title">Registrations & Events Overview</div>
-          <canvas baseChart
-            [data]="barChartData"
-            [options]="barChartOptions"
-            type="bar">
-          </canvas>
+      <!-- Live Activity -->
+      <div class="activity-card stagger-item" style="animation-delay:.35s">
+        <div class="activity-head">
+          <div class="ch-icon green" style="width:36px;height:36px"><i class="pi pi-bolt" style="font-size:15px"></i></div>
+          <div>
+            <div class="ch-title">Live Activity</div>
+            <div class="ch-sub">Real-time platform events</div>
+          </div>
+          <div class="live-pill"><span class="live-dot-sm"></span> Live</div>
         </div>
-        <div class="chart-card">
-          <div class="chart-title">Club Approval Status</div>
-          <canvas baseChart
-            [data]="pieChartData"
-            type="pie">
-          </canvas>
+        <div class="activity-list">
+          <div class="activity-item" *ngFor="let act of activities; let i = index" [style.animation-delay]="(i * 0.05) + 's'">
+            <div class="act-dot" [ngClass]="act.type"></div>
+            <div class="act-content">
+              <div class="act-text">{{ act.text }}</div>
+              <div class="act-time">{{ act.time }}</div>
+            </div>
+          </div>
+          <div class="act-empty" *ngIf="activities.length === 0">Waiting for activity…</div>
         </div>
       </div>
-	  
-	  <div class="activity-card">
-  <h3>Live Activity</h3>
 
-  <div class="activity-list">
-    <div
-      class="activity-item"
-      *ngFor="let act of activities; let i = index"
-      [style.animation-delay]="(i * 0.05) + 's'">
-
-      <div class="act-dot" [ngClass]="act.type"></div>
-
-      <div class="act-content">
-        <div class="act-text">{{ act.text }}</div>
-        <div class="act-time">{{ act.time }}</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-      <!-- Quick nav cards -->
-      <div class="sec-header" style="margin-top:8px">
+      <!-- Quick Nav -->
+      <div class="sec-header">
         <h2 class="sec-title">Platform Management</h2>
       </div>
       <div class="quick-grid">
-        <a class="quick-card" routerLink="/admin/users" style="--qc-color:#0891b2">
+        <a class="quick-card" routerLink="/admin/users" style="--qc:#0891b2">
           <div class="qc-icon"><i class="pi pi-users"></i></div>
           <div class="qc-label">Manage Users</div>
         </a>
-        <a class="quick-card" routerLink="/admin/club-approvals" style="--qc-color:#d97706">
+        <a class="quick-card" routerLink="/admin/club-approvals" style="--qc:#d97706">
           <div class="qc-icon"><i class="pi pi-building"></i></div>
           <div class="qc-label">Club Approvals</div>
         </a>
-        <a class="quick-card" routerLink="/admin/events" style="--qc-color:#7c3aed">
+        <a class="quick-card" routerLink="/admin/events" style="--qc:#7c3aed">
           <div class="qc-icon"><i class="pi pi-calendar"></i></div>
           <div class="qc-label">All Events</div>
         </a>

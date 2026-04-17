@@ -11,7 +11,7 @@
 
   <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
 
-  <div class="card empty-state" *ngIf="!loading && events.length === 0">
+  <div class="empty-state" *ngIf="!loading && events.length === 0">
     <i class="pi pi-calendar-plus empty-icon"></i>
     <h3>No events yet</h3>
     <p>Create your first event to start engaging your community.</p>
@@ -21,57 +21,110 @@
   </div>
 
   <ng-container *ngIf="!loading && events.length > 0">
-    <!-- Filter bar -->
-    <div class="filter-bar card">
-      <p-tabmenu [model]="filterTabs" [(activeItem)]="activeTab" (activeItemChange)="onTabChange($event)" styleClass="events-tabs"></p-tabmenu>
-      <p-iconfield>
-        <p-inputicon styleClass="pi pi-search" />
-        <input pInputText type="text" placeholder="Search events…" [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
-      </p-iconfield>
+    <!-- Stats strip -->
+    <div class="stats-strip">
+      <div class="stat-pill" [class.act]="statusFilter==='ALL'" (click)="setStatusFilter('ALL')">
+        <span class="sp-num">{{ events.length }}</span><span class="sp-lbl">Total</span>
+      </div>
+      <div class="stat-pill" [class.act]="statusFilter==='PUBLISHED'" (click)="setStatusFilter('PUBLISHED')">
+        <span class="sp-dot green"></span>
+        <span class="sp-num">{{ publishedCount }}</span><span class="sp-lbl">Published</span>
+      </div>
+      <div class="stat-pill" [class.act]="statusFilter==='DRAFT'" (click)="setStatusFilter('DRAFT')">
+        <span class="sp-dot amber"></span>
+        <span class="sp-num">{{ draftCount }}</span><span class="sp-lbl">Draft</span>
+      </div>
+      <div class="stat-pill" [class.act]="statusFilter==='CANCELLED'" (click)="setStatusFilter('CANCELLED')">
+        <span class="sp-dot red"></span>
+        <span class="sp-num">{{ cancelledCount }}</span><span class="sp-lbl">Cancelled</span>
+      </div>
+
+      <!-- Search -->
+      <div class="ev-search">
+        <i class="pi pi-search"></i>
+        <input type="text" placeholder="Search events…" [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
+      </div>
     </div>
 
     <div class="no-results" *ngIf="filteredEvents.length === 0">
-      <p-message severity="info" text="No events match your filter." styleClass="w-full"></p-message>
+      <i class="pi pi-inbox"></i> No events match your filter.
     </div>
 
     <div class="ev-grid" *ngIf="filteredEvents.length > 0">
       <div class="ev-card stagger-item" *ngFor="let ev of filteredEvents; let i = index"
-        [style.animation-delay]="(i * 0.05) + 's'">
+        [style.animation-delay]="(i * 0.05) + 's'"
+        [class.is-cancelled]="ev.status === 'CANCELLED'"
+        [class.is-draft]="ev.status === 'DRAFT'">
 
+        <!-- Banner -->
         <div class="ev-banner" [ngClass]="getBannerColor(ev.eventId)">
-          <p-tag
-            [value]="ev.status === 'PUBLISHED' ? 'Published' : ev.status === 'DRAFT' ? 'Draft' : 'Cancelled'"
-            [severity]="ev.status === 'PUBLISHED' ? 'success' : ev.status === 'DRAFT' ? 'secondary' : 'danger'"
-            styleClass="status-tag"
-          ></p-tag>
-          <p-tag
-            [value]="ev.paid ? '₹' + ev.fee : 'FREE'"
-            [severity]="ev.paid ? 'warning' : 'info'"
-            styleClass="fee-tag"
-          ></p-tag>
-        </div>
-
-        <div class="ev-body">
-          <h3 class="ev-title">{{ ev.title }}</h3>
-          <p class="ev-desc">{{ ev.description }}</p>
-          <div class="ev-chips">
-            <p-chip [label]="ev.location || 'TBA'" icon="pi pi-map-marker" styleClass="meta-chip"></p-chip>
-            <p-chip [label]="formatDate(ev.eventDate)" icon="pi pi-calendar" styleClass="meta-chip"></p-chip>
-            <p-chip [label]="(ev.capacity || '∞') + ' capacity'" icon="pi pi-users" styleClass="meta-chip"></p-chip>
+          <div class="ev-banner-overlay"></div>
+          <div class="ev-banner-badges">
+            <span class="status-badge" [ngClass]="ev.status.toLowerCase()">
+              <span class="status-dot"></span>
+              {{ ev.status === 'PUBLISHED' ? 'Published' : ev.status === 'DRAFT' ? 'Draft' : 'Cancelled' }}
+            </span>
+            <span class="fee-badge" [class.paid]="ev.paid" [class.free]="!ev.paid">
+              {{ ev.paid ? '₹' + ev.fee : 'FREE' }}
+            </span>
+          </div>
+          <!-- Reg count bubble -->
+          <div class="reg-bubble" *ngIf="ev.registrationCount > 0">
+            <i class="pi pi-users"></i> {{ ev.registrationCount }}
           </div>
         </div>
 
+        <!-- Body -->
+        <div class="ev-body">
+          <h3 class="ev-title">{{ ev.title }}</h3>
+          <p class="ev-desc" *ngIf="ev.description">{{ ev.description }}</p>
+          <div class="ev-meta-row">
+            <span class="ev-meta-chip"><i class="pi pi-map-marker"></i>{{ ev.location || 'TBA' }}</span>
+            <span class="ev-meta-chip"><i class="pi pi-calendar"></i>{{ formatDate(ev.eventDate) }}</span>
+            <span class="ev-meta-chip"><i class="pi pi-users"></i>{{ ev.capacity || '∞' }} capacity</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
         <div class="ev-actions">
-          <p-button icon="pi pi-users" [text]="true" size="small" pTooltip="View Registrants" tooltipPosition="top"
-            [routerLink]="['/organizer/event-registrants', ev.eventId]"></p-button>
-          <p-button icon="pi pi-pencil" [text]="true" size="small" pTooltip="Edit" tooltipPosition="top"
-            [routerLink]="['/organizer/edit-event', ev.eventId]"></p-button>
-          <p-button *ngIf="ev.status === 'DRAFT'" icon="pi pi-send" [text]="true" size="small" severity="success"
-            pTooltip="Publish" tooltipPosition="top" (onClick)="publish(ev.eventId)"></p-button>
-          <p-button *ngIf="ev.status !== 'CANCELLED'" icon="pi pi-ban" [text]="true" size="small" severity="danger"
-            pTooltip="Cancel" tooltipPosition="top" (onClick)="cancel(ev.eventId)"></p-button>
+          <a [routerLink]="['/organizer/event-registrants', ev.eventId]" class="act-btn teal"
+            pTooltip="View Registrants" tooltipPosition="top">
+            <i class="pi pi-users"></i>
+          </a>
+          <a [routerLink]="['/organizer/edit-event', ev.eventId]" class="act-btn blue"
+            pTooltip="Edit Event" tooltipPosition="top">
+            <i class="pi pi-pencil"></i>
+          </a>
+          <button *ngIf="ev.status === 'DRAFT'" class="act-btn green"
+            pTooltip="Publish Event" tooltipPosition="top"
+            [class.loading]="publishing.has(ev.eventId)"
+            [disabled]="publishing.has(ev.eventId)"
+            (click)="publish(ev.eventId)">
+            <i class="pi" [class.pi-send]="!publishing.has(ev.eventId)" [class.pi-spin]="publishing.has(ev.eventId)" [class.pi-spinner]="publishing.has(ev.eventId)"></i>
+          </button>
+          <button *ngIf="ev.status !== 'CANCELLED'" class="act-btn red"
+            pTooltip="Cancel Event" tooltipPosition="top"
+            [class.loading]="cancelling.has(ev.eventId)"
+            [disabled]="cancelling.has(ev.eventId)"
+            (click)="confirmCancel(ev)">
+            <i class="pi" [class.pi-ban]="!cancelling.has(ev.eventId)" [class.pi-spin]="cancelling.has(ev.eventId)" [class.pi-spinner]="cancelling.has(ev.eventId)"></i>
+          </button>
         </div>
       </div>
     </div>
   </ng-container>
+
+  <!-- Confirm Cancel Modal -->
+  <div class="modal-backdrop" *ngIf="cancelTarget" (click)="cancelTarget=null"></div>
+  <div class="confirm-modal" *ngIf="cancelTarget">
+    <div class="cm-icon"><i class="pi pi-exclamation-triangle"></i></div>
+    <h3>Cancel Event?</h3>
+    <p>Cancel <strong>"{{ cancelTarget.title }}"</strong>? Registered students will be notified and the event will be closed.</p>
+    <div class="cm-actions">
+      <button class="cm-btn secondary" (click)="cancelTarget=null">Keep Event</button>
+      <button class="cm-btn danger" [disabled]="cancelling.has(cancelTarget.eventId)" (click)="cancelEvent(cancelTarget.eventId)">
+        <i class="pi pi-ban"></i> Yes, Cancel
+      </button>
+    </div>
+  </div>
 </div>

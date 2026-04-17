@@ -415,3 +415,69 @@
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+/* ══ ENHANCED SMOOTH ANIMATIONS (override) ══ */
+@keyframes boxEnter {
+  0%   { opacity: 0; transform: translateY(28px) scale(.95); filter: blur(4px); }
+  60%  { filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+.box { animation: boxEnter .55s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* Staggered field entries */
+.p-field:nth-child(1) { animation: fieldIn .4s cubic-bezier(.22,1,.36,1) .15s both; }
+.p-field:nth-child(2) { animation: fieldIn .4s cubic-bezier(.22,1,.36,1) .22s both; }
+.p-field:nth-child(3) { animation: fieldIn .4s cubic-bezier(.22,1,.36,1) .28s both; }
+@keyframes fieldIn { from { opacity:0; transform:translateX(-10px); } to { opacity:1; transform:translateX(0); } }
+
+/* Smoother input focus transition */
+.inp-field {
+  transition: background .22s, border-color .22s, box-shadow .22s, transform .22s !important;
+}
+
+/* Enhanced blob + aurora */
+@keyframes blobMorph {
+  0%   { transform: translate(0,0) scale(1) rotate(0deg); border-radius: 50%; }
+  20%  { transform: translate(22px,-14px) scale(1.06) rotate(4deg); border-radius: 55% 45% 48% 52%; }
+  40%  { transform: translate(-14px,28px) scale(.94) rotate(-3deg); border-radius: 48% 52% 55% 45%; }
+  60%  { transform: translate(18px,12px) scale(1.03) rotate(2deg); border-radius: 52% 48% 45% 55%; }
+  80%  { transform: translate(-8px,-18px) scale(.97) rotate(-2deg); border-radius: 45% 55% 52% 48%; }
+  100% { transform: translate(0,0) scale(1) rotate(0deg); border-radius: 50%; }
+}
+
+/* CTA button smoother transition */
+.cta-btn {
+  transition: transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s cubic-bezier(.22,1,.36,1), opacity .22s !important;
+}
+
+/* Join cards smoother */
+.join-card {
+  transition: all .28s cubic-bezier(.22,1,.36,1) !important;
+}
+
+/* Feature rows stagger in */
+.ll-feat {
+  opacity: 0;
+  animation: featIn .5s cubic-bezier(.22,1,.36,1) both;
+}
+.feat-1 { animation-delay: .35s; }
+.feat-2 { animation-delay: .42s; }
+.feat-3 { animation-delay: .49s; }
+.feat-4 { animation-delay: .56s; }
+@keyframes featIn {
+  from { opacity:0; transform:translateX(-16px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+/* Stats row */
+.stats-row { animation: fadeUp .6s cubic-bezier(.22,1,.36,1) .25s both; }
+.ll-hero h1 { animation: fadeUp .65s cubic-bezier(.22,1,.36,1) .08s both; }
+.ll-hero p  { animation: fadeUp .65s cubic-bezier(.22,1,.36,1) .16s both; }
+
+/* Smooth page transition when switching login/register */
+.login-form, .register-form-wrap {
+  animation: formSlide .38s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes formSlide {
+  from { opacity:0; transform:translateY(10px) scale(.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}

@@ -1,21 +1,17 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { DividerModule } from 'primeng/divider';
-import { MessageModule } from 'primeng/message';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EventService } from '../../core/services/event.service';
 import { RegistrationService } from '../../core/services/registration.service';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import { takeUntil, switchMap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TagModule, ProgressBarModule, DividerModule, MessageModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './event-detail.component.html',
   styleUrls: ['./event-detail.component.scss']
 })
@@ -46,8 +42,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
           this.loading = true;
           this.event = null;
           this.notFound = false;
-          const eventId = Number(params['id']);
-          return this.eventService.getEventById(eventId);
+          return this.eventService.getEventById(Number(params['id']));
         })
       )
       .subscribe({
@@ -69,7 +64,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
 
   checkIfRegistered(eventId: number) {
     this.registrationService.getMyRegistrationEventIds().subscribe({
-      next: (ids: number[]) => { this.alreadyRegistered = ids.includes(eventId); },
+      next: (ids: number[]) => { this.alreadyRegistered = ids.includes(eventId); this.cdr.detectChanges(); },
       error: () => {}
     });
   }
@@ -102,12 +97,41 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  formatShortDate(date: string): string {
+    if (!date) return 'TBA';
+    return new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  formatTime(date: string): string {
+    if (!date) return 'TBA';
+    return new Date(date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  }
+
   isPastEvent(): boolean {
     if (!this.event?.eventDate) return false;
     return new Date(this.event.eventDate) < new Date();
   }
 
+  isLiveNow(): boolean {
+    if (!this.event?.eventDate) return false;
+    const d = new Date(this.event.eventDate);
+    const now = new Date();
+    const diff = now.getTime() - d.getTime();
+    return diff >= 0 && diff < 3 * 60 * 60 * 1000; // within 3h of start
+  }
+
+  getCapacityPercent(): number {
+    if (!this.event?.capacity) return 0;
+    return Math.min(100, Math.round(((this.event.capacity - this.event.spotsLeft) / this.event.capacity) * 100));
+  }
+
   getBannerColor(id: number): string {
     return ['bv1','bv2','bv3','bv4','bv5','bv6'][(id || 0) % 6];
+  }
+
+  getImageUrl(imageUrl: string): string {
+    if (!imageUrl) return '';
+    if (imageUrl.startsWith('http')) return imageUrl;
+    return `${environment.apiUrl}${imageUrl}`;
   }
 }
