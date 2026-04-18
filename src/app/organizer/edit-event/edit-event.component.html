@@ -71,16 +71,24 @@
         <h4 class="section-title"><i class="pi pi-map-marker"></i> Location &amp; Category</h4>
         <div class="form-row-2">
           <div class="p-field">
+            <label class="field-label">Place <span class="req">*</span></label>
+            <input pInputText type="text" formControlName="place" class="w-full"
+              placeholder="e.g. Block A Auditorium"
+              [class.ng-invalid]="form.get('place')?.invalid && form.get('place')?.touched" />
+            <small class="p-error" *ngIf="form.get('place')?.invalid && form.get('place')?.touched">Place is required</small>
+          </div>
+          <div class="p-field">
             <label class="field-label">Location <span class="req">*</span></label>
             <p-iconfield class="w-full">
               <p-inputicon styleClass="pi pi-map-marker" />
-              <input pInputText type="text" formControlName="location" class="w-full" />
+              <input pInputText type="text" formControlName="location" class="w-full"
+                placeholder="e.g. Hyderabad" />
             </p-iconfield>
           </div>
-          <div class="p-field">
-            <label class="field-label">Category</label>
-            <p-select formControlName="category" [options]="categories" class="w-full"></p-select>
-          </div>
+        </div>
+        <div class="p-field">
+          <label class="field-label">Category</label>
+          <p-select formControlName="category" [options]="categories" class="w-full"></p-select>
         </div>
       </div>
 

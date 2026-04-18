@@ -59,6 +59,7 @@
             </div>
             <h3 class="reg-title">{{ reg.event?.title }}</h3>
             <div class="reg-meta">
+              <span *ngIf="reg.event?.place"><i class="pi pi-building"></i> {{ reg.event?.place }}</span>
               <span><i class="pi pi-map-marker"></i> {{ reg.event?.location || 'TBA' }}</span>
               <span><i class="pi pi-calendar"></i> {{ formatDate(reg.event?.eventDate) }}</span>
             </div>
@@ -99,6 +100,7 @@
     <div class="ticket" *ngIf="selectedRegistration">
       <div class="ticket-top">
         <h3 class="ticket-event-name">{{ selectedRegistration.event?.title?.toUpperCase() }}</h3>
+        <p class="ticket-venue" *ngIf="selectedRegistration.event?.place">{{ selectedRegistration.event?.place?.toUpperCase() }}</p>
         <p class="ticket-venue">{{ selectedRegistration.event?.location?.toUpperCase() || 'VENUE TBA' }}</p>
       </div>
       <div class="ticket-qr">

@@ -79,6 +79,7 @@
           <h3 class="ev-title">{{ ev.title }}</h3>
           <p class="ev-desc" *ngIf="ev.description">{{ ev.description }}</p>
           <div class="ev-meta-row">
+		    <span class="ev-meta-chip"><i class="pi pi-building"></i>{{ ev.place || 'TBA' }}</span>
             <span class="ev-meta-chip"><i class="pi pi-map-marker"></i>{{ ev.location || 'TBA' }}</span>
             <span class="ev-meta-chip"><i class="pi pi-calendar"></i>{{ formatDate(ev.eventDate) }}</span>
             <span class="ev-meta-chip"><i class="pi pi-users"></i>{{ ev.capacity || '∞' }} capacity</span>
@@ -87,11 +88,11 @@
 
         <!-- Actions -->
         <div class="ev-actions">
-          <a [routerLink]="['/organizer/event-registrants', ev.eventId]" class="act-btn teal"
+          <a [routerLink]="['/organizer/event', ev.eventId, 'registrants']" class="act-btn teal"
             pTooltip="View Registrants" tooltipPosition="top">
             <i class="pi pi-users"></i>
           </a>
-          <a [routerLink]="['/organizer/edit-event', ev.eventId]" class="act-btn blue"
+          <a [routerLink]="['/organizer/event', ev.eventId, 'edit']" class="act-btn blue"
             pTooltip="Edit Event" tooltipPosition="top">
             <i class="pi pi-pencil"></i>
           </a>

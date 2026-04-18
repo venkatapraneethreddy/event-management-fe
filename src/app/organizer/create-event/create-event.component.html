@@ -38,21 +38,46 @@
       <p-divider></p-divider>
 
       <div class="form-section">
-        <h4 class="section-title"><i class="pi pi-map-marker"></i> Location &amp; Category</h4>
-        <div class="form-row-2">
-          <div class="p-field">
-            <label class="field-label">Location <span class="req">*</span></label>
-            <p-iconfield class="w-full">
-              <p-inputicon styleClass="pi pi-map-marker" />
-              <input pInputText type="text" formControlName="location" placeholder="e.g. Auditorium A" class="w-full" />
-            </p-iconfield>
-          </div>
-          <div class="p-field">
-            <label class="field-label">Category</label>
-            <p-select formControlName="category" [options]="categories" placeholder="Select category" class="w-full"></p-select>
-          </div>
-        </div>
-      </div>
+  <h4 class="section-title"><i class="pi pi-map-marker"></i> Location & Category</h4>
+
+  <div class="form-row-2">
+
+    <!-- ✅ NEW PLACE FIELD -->
+    <div class="p-field">
+      <label class="field-label">Place <span class="req">*</span></label>
+      <p-iconfield class="w-full">
+        <p-inputicon styleClass="pi pi-building" />
+        <input pInputText type="text" formControlName="place"
+          placeholder="e.g. Block A Auditorium"
+          class="w-full"
+          [class.ng-invalid]="form.get('place')?.invalid && form.get('place')?.touched" />
+      </p-iconfield>
+      <small class="p-error"
+        *ngIf="form.get('place')?.invalid && form.get('place')?.touched">
+        Place is required
+      </small>
+    </div>
+
+    <!-- EXISTING LOCATION -->
+    <div class="p-field">
+      <label class="field-label">Location <span class="req">*</span></label>
+      <p-iconfield class="w-full">
+        <p-inputicon styleClass="pi pi-map-marker" />
+        <input pInputText type="text" formControlName="location"
+          placeholder="e.g. Hyderabad"
+          class="w-full" />
+      </p-iconfield>
+    </div>
+
+  </div>
+
+  <!-- CATEGORY -->
+  <div class="p-field">
+    <label class="field-label">Category</label>
+    <p-select formControlName="category" [options]="categories"
+      placeholder="Select category" class="w-full"></p-select>
+  </div>
+</div>
 
       <p-divider></p-divider>
 

@@ -80,6 +80,13 @@
                 <div class="sched-val">{{ formatDate(event.eventDate) }}</div>
               </div>
             </div>
+			<div class="sched-item" *ngIf="event.place">
+              <i class="pi pi-building"></i>
+              <div>
+                <div class="sched-lbl">Place</div>
+                <div class="sched-val venue-val">{{ event.place }}</div>
+              </div>
+            </div>
             <div class="sched-item">
               <i class="pi pi-map-marker"></i>
               <div>
@@ -209,10 +216,17 @@
             </div>
           </div>
           <div class="qi-sep"></div>
+          <div class="qi-item" *ngIf="event.place">
+            <i class="pi pi-building"></i>
+            <div>
+              <div class="qi-lbl">Venue</div>
+              <div class="qi-val">{{ event.place }}</div>
+            </div>
+          </div>
           <div class="qi-item">
             <i class="pi pi-map-marker"></i>
             <div>
-              <div class="qi-lbl">Venue</div>
+              <div class="qi-lbl">Location</div>
               <div class="qi-val">{{ event.location || 'TBA' }}</div>
             </div>
           </div>

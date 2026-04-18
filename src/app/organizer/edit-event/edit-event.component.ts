@@ -52,6 +52,7 @@ export class EditEventComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       title:       ['', [Validators.required, Validators.minLength(3)]],
       description: ['', Validators.required],
+      place:       ['', Validators.required],
       location:    ['', Validators.required],
       eventDate:   ['', Validators.required],
       capacity:    [null, [Validators.required, Validators.min(1)]],
@@ -80,7 +81,7 @@ export class EditEventComponent implements OnInit, OnDestroy {
             ? new Date(event.eventDate).toISOString().slice(0, 16) : '';
           this.form.patchValue({
             title: event.title, description: event.description,
-            location: event.location, eventDate: dateStr,
+            place: event.place, location: event.location, eventDate: dateStr,
             capacity: event.capacity, category: event.category || 'OTHER',
             paid: event.paid, fee: event.fee ?? 0
           });

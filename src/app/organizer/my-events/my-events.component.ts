@@ -59,7 +59,7 @@ export class MyEventsComponent implements OnInit, OnDestroy {
     if (this.statusFilter !== 'ALL') result = result.filter(e => e.status === this.statusFilter);
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
-      result = result.filter(e => e.title?.toLowerCase().includes(term) || e.location?.toLowerCase().includes(term));
+      result = result.filter(e => e.title?.toLowerCase().includes(term) || e.location?.toLowerCase().includes(term) || e.place?.toLowerCase().includes(term));
     }
     this.filteredEvents = result;
     this.cdr.detectChanges();

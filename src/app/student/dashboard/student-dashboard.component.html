@@ -133,6 +133,7 @@
             <!-- Time + location bar -->
             <div class="ev-time-bar">
               <span class="ev-time"><i class="pi pi-clock"></i>{{ formatTime(e.eventDate) }}</span>
+              <span class="ev-location" *ngIf="e.place"><i class="pi pi-building"></i>{{ e.place }}</span>
               <span class="ev-location"><i class="pi pi-map-marker"></i>{{ e.location || 'TBA' }}</span>
             </div>
           </div>
@@ -280,6 +281,10 @@
         <div class="drawer-meta-item">
           <i class="pi pi-clock"></i>
           <span>{{ formatTime(selectedEvent.eventDate) }}</span>
+        </div>
+		<div class="drawer-meta-item" *ngIf="selectedEvent.place">
+          <i class="pi pi-building"></i>
+          <span>{{ selectedEvent.place }}</span>
         </div>
         <div class="drawer-meta-item" *ngIf="selectedEvent.location">
           <i class="pi pi-map-marker"></i>
